@@ -1,0 +1,46 @@
+# Python bytecode and cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment files
+venv/
+env/
+*.env
+
+# Database files
+*.sqlite3
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# IDE/editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Static files and media (if generated or uploaded)
+staticfiles/
+media/
+
+# Compiled assets (if any, e.g., node_modules)
+node_modules/
+
+# Coverage reports
+htmlcov/
+.coverage
+
+# Pytest cache
+.pytest_cache/
+
+# Migrations (optional, some teams keep them in repo)
+# apps/**/migrations/__pycache__/
+# apps/**/migrations/*.pyc
+
+# Debug toolbar (optional)
+debug_toolbar/
