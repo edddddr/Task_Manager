@@ -3,14 +3,9 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from core.decorators import ajax_login_required
 from django.views.decorators.http import require_POST
 from apps.users.models import User
-
-def user_list(request):
-    users = User.objects.all().values(
-        "id", "username", "email", "first_name", "last_name"
-    )
-    return JsonResponse(list(users), safe=False)
 
 
 @csrf_exempt
@@ -76,9 +71,18 @@ def login_view(request):
 
 
 
-@login_required
+@ajax_login_required
 @require_POST
 @csrf_exempt
 def logout_view(request):
     logout(request)
     return JsonResponse({'status': 'success', 'message': 'Logged out successfully'})
+
+
+@ajax_login_required
+@csrf_exempt
+def user_list(request):
+    users = User.objects.all().values(
+        "id", "username", "email", "first_name", "last_name"
+    )
+    return JsonResponse(list(users), safe=False)
