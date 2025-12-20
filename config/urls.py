@@ -4,9 +4,9 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('users/', include('apps.users.urls')),
-    path('tasks/', include('apps.tasks.urls')),
-    path('projects/', include('apps.projects.urls'))
+    path('api/v1/users/', include('apps.users.urls')),
+    path('api/v1/tasks/', include('apps.tasks.urls')),
+    path('api/v1/projects/', include('apps.projects.urls'))
 ]
 
 
