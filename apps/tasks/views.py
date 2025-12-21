@@ -6,7 +6,8 @@ from core.decorators import ajax_login_required
 
 from .models import Task
 from apps.projects.models import Project
-from apps.users.models import User
+
+
 
 
 @ajax_login_required
@@ -69,3 +70,11 @@ def task_detail(request, task_id):
         )
 
     return HttpResponseNotAllowed(["GET", "PUT", "PATCH", "DELETE"])
+
+
+
+# from django.contrib.auth import get_user_model
+
+# User = get_user_model()
+
+# assigned_to = User.objects.get(id=body["assigned_to"])

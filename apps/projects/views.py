@@ -4,7 +4,6 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from core.decorators import ajax_login_required
 from .models import Project
-from apps.users.models import User
 
 # List & Create Projects
 @ajax_login_required
