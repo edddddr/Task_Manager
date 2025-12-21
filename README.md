@@ -40,7 +40,7 @@ This project is designed as a **learning-focused, production-style MVP**, emphas
 ---
 
 ## 🏗️ Project Architecture
-```
+```text
 .task_manager/
 ├── apps/
 │   ├── users/
