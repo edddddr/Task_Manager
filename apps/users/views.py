@@ -20,6 +20,7 @@ def register(request):
     password = data.get("password")
     first_name = data.get("first_name")
     last_name = data.get("last_name")
+    role = data.get("role")
 
     if not username or not email or not password or not first_name or not last_name:
         return JsonResponse(
@@ -35,7 +36,8 @@ def register(request):
         email=email,
         password=password,
         first_name=first_name,
-        last_name=last_name
+        last_name=last_name,
+        role=role
     )
 
     return JsonResponse({
@@ -43,7 +45,8 @@ def register(request):
         'user' : {
             "id": user.id,
             "username": user.username,
-            "email": user.email
+            "email": user.email, 
+            "role": user.role,
             }
             }, 
             status=201
@@ -79,10 +82,10 @@ def logout_view(request):
     return JsonResponse({'status': 'success', 'message': 'Logged out successfully'})
 
 
-@ajax_login_required
+# @ajax_login_required
 @csrf_exempt
 def user_list(request):
     users = User.objects.all().values(
-        "id", "username", "email", "first_name", "last_name"
+        "id", "username", "email", "first_name", "last_name", "role"
     )
     return JsonResponse(list(users), safe=False)

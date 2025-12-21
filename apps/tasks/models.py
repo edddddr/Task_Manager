@@ -1,5 +1,6 @@
 from django.db  import models
 from django.conf import settings # Reusable app for user
+from apps.users.models import User
 
 
 

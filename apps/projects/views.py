@@ -2,11 +2,14 @@ import json
 from django.http import JsonResponse, HttpResponseNotAllowed, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from core.decorators import ajax_login_required
+from core.decorators import ajax_login_required, role_required
+from core.permissions import can_edit_project, is_admin, is_manager
 from .models import Project
 
 # List & Create Projects
 @ajax_login_required
+# This decoration can be used here, but in the case of getting projects for members have a permission.
+# @role_required(["admin", "manager"]) 
 @csrf_exempt 
 def project_list_create(request):
 
@@ -16,6 +19,8 @@ def project_list_create(request):
         return JsonResponse(data, safe=False)
     
     elif request.method == "POST":
+        if not is_admin(request.user) or not is_manager(request.user): # confirm the crater is weather the admin or manager
+            return JsonResponse({"message": "Permission denied"}, status=403)
         try:
             body = json.loads(request.body)
 
@@ -51,6 +56,8 @@ def project_detail(request, project_id):
 
 
     elif request.method in ["PUT", "PATCH"]:
+        if not can_edit_project(request.user, project): # 
+            return JsonResponse({"message": "Permission denied"}, status=403)
         try:
             body = json.loads(request.body)
             project.update_project(
@@ -65,7 +72,11 @@ def project_detail(request, project_id):
             return JsonResponse({"status" : "error", "message": str(e)}, status=400)
 
     elif request.method == "DELETE":
+        if not is_admin(request.user): # confirm the crater is weather the admin or manager
+            return JsonResponse({"message": "Permission denied"}, status=403)
+
         project.delete()
+
         return JsonResponse({"status" : "sucess", "message":"Project was deleted successfully"}, status=200)
     else:
         return HttpResponseNotAllowed(["GET", "PUT", "PATCH", "DELETE"])

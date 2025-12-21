@@ -17,6 +17,16 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(username, email, password, **extra_fields)
 
 class User(AbstractBaseUser, PermissionsMixin):
+    ROLE_ADMIN = "admin"
+    ROLE_MANAGER = "manager"
+    ROLE_MEMBER = "member"
+
+    ROLE_CHOICES = [
+        (ROLE_ADMIN, "Admin"),
+        (ROLE_MANAGER, "Manager"),
+        (ROLE_MEMBER, "Member"),
+    ]
+
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=50, blank=True)
@@ -24,6 +34,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default=ROLE_MEMBER)
 
     objects = CustomUserManager()
 

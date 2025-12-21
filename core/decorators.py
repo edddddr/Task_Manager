@@ -14,3 +14,18 @@ def ajax_login_required(view_func):
             )
         return view_func(request, *args, **kwargs)
     return _wrapped_view
+
+
+def role_required(roles):
+    def decorator(view_func):
+        @wraps(view_func)
+        def wrapper(request, *args, **kwargs):
+            if not request.user.is_authenticated:
+                return JsonResponse({"detail": "Authentication required"}, status=401)
+
+            if request.user.role not in roles:
+                return JsonResponse({"detail": "Permission denied"}, status=403)
+
+            return view_func(request, *args, **kwargs)
+        return wrapper
+    return decorator

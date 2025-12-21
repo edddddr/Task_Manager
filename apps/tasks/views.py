@@ -3,6 +3,7 @@ from django.http import JsonResponse, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from core.decorators import ajax_login_required
+from core.permissions import can_delete_task, can_edit_task, is_admin, is_manager
 
 from .models import Task
 from apps.projects.models import Project
@@ -26,6 +27,8 @@ def task_list_create(request, project_id):
         )
 
     elif request.method == "POST":
+        if not is_admin(request.user) or not is_manager(request.user): # confirm the crater is weather the admin or manager
+            return JsonResponse({"message": "Permission denied"}, status=403)
         body = json.loads(request.body)
         task = Task.create_task(project=project, data=body)
 
@@ -54,6 +57,9 @@ def task_detail(request, task_id):
         )
 
     elif request.method in ["PUT", "PATCH"]:
+        if not can_edit_task(request.user, task):
+             return JsonResponse({"message": "Permission denied"}, status=403)
+
         body = json.loads(request.body)
         task.update_task(body)
 
@@ -63,6 +69,8 @@ def task_detail(request, task_id):
         )
 
     elif request.method == "DELETE":
+        if not can_delete_task(request.user, task):
+            return JsonResponse({"message": "Permission denied"}, status=403)
         task.delete()
         return JsonResponse(
             {"status": "success", "message": "Task deleted"},
