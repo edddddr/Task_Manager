@@ -1,13 +1,13 @@
 from django.db import models
-from apps.users.models import User
+from django.conf import settings # Reusable app for user
 
 
 
 class Project(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='created_projects')
-    members = models.ManyToManyField(User, related_name='projects')
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='created_projects')
+    members = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='projects')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
