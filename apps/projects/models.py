@@ -13,3 +13,47 @@ class Project(models.Model):
 
     def __str__(self):
         return self.name
+
+
+    @classmethod
+    def create_project(cls, *, name, description, creator):
+        """
+        Factory method for creating a project.
+        """
+        project = cls.objects.create(
+            name=name,
+            description=description,
+            created_by=creator
+        )
+        project.members.add(creator)
+        return project
+
+
+
+    def update_project(self, *, name=None, description=None):
+        """
+        Update allowed fields only.
+        """
+        if name is not None:
+            self.name = name
+        if description is not None:
+            self.description = description
+        self.save()
+        return self
+
+
+
+    def to_dict(self):
+        """
+        Serialize project to JSON-safe dict.
+        """
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "created_by": self.created_by.id if self.created_by else None,
+            "members": list(self.members.values_list("id", flat=True)),
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+        }
+
