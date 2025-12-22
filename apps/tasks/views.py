@@ -2,12 +2,13 @@ import json
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-
 from core.decorators import ajax_login_required
+from core.permissions import can_delete_task, can_edit_task, is_admin, is_manager
 
 from .models import Task
 from apps.projects.models import Project
-from apps.users.models import User
+
+
 
 
 @ajax_login_required
@@ -17,55 +18,31 @@ def task_list_create(request, project_id):
 
     if request.method == "GET":
         tasks = project.tasks.all()
-        data = [{"status" : "success"}]
-        for task in tasks:
-            data.append({
-               
-                "id": task.id,
-                "title": task.title,
-                "description": task.description,
-                "status": task.status,
-                "priority": task.priority,
-                "assigned_to": task.assigned_to.id if task.assigned_to else None,
-                "due_date": task.due_date,
-                "created_at": task.created_at,
-                "updated_at": task.updated_at
-
-            })
-        return JsonResponse(data, safe=False, status=200)
+        return JsonResponse(
+            {
+                "status": "success",
+                "tasks": [task.to_dict() for task in tasks],
+            },
+            status=200
+        )
 
     elif request.method == "POST":
+        if not is_admin(request.user) or not is_manager(request.user): # confirm the crater is weather the admin or manager
+            return JsonResponse({"message": "Permission denied"}, status=403)
         body = json.loads(request.body)
-
-        assigned_to = None
-        if body.get("assigned_to"):
-            assigned_to = User.objects.get(id=body["assigned_to"])
-
-        task = Task.objects.create(
-            title=body["title"],
-            description=body.get("description", ""),
-            status=body.get("status", "todo"),
-            priority=body.get("priority", "medium"),
-            project=project,
-            assigned_to=assigned_to,
-            due_date=body.get("due_date")
-        )
+        task = Task.create_task(project=project, data=body)
 
         return JsonResponse(
             {
-            "status" : "seccess",
-            "task":{
-                "id": task.id,
-                "title": task.title,
-                "status": task.status,
-                "priority": task.priority,
-                }
-            }, 
+                "status": "success",
+                "task": task.to_dict(),
+            },
             status=201
-            )
-    
+        )
 
     return HttpResponseNotAllowed(["GET", "POST"])
+
+
 
 
 @ajax_login_required
@@ -75,41 +52,37 @@ def task_detail(request, task_id):
 
     if request.method == "GET":
         return JsonResponse(
-            {"status": "success",
-            "task" :{
-            "id": task.id,
-            "title": task.title,
-            "description": task.description,
-            "status": task.status,
-            "priority": task.priority,
-            "project": task.project.id,
-            "assigned_to": task.assigned_to.id if task.assigned_to else None,
-            "due_date": task.due_date,
-            "created_at": task.created_at,
-            "updated_at": task.updated_at,
-        }}, status=200)
+            {"status": "success", "task": task.to_dict()},
+            status=200
+        )
 
     elif request.method in ["PUT", "PATCH"]:
+        if not can_edit_task(request.user, task):
+             return JsonResponse({"message": "Permission denied"}, status=403)
+
         body = json.loads(request.body)
+        task.update_task(body)
 
-        task.title = body.get("title", task.title)
-        task.description = body.get("description", task.description)
-        task.status = body.get("status", task.status)
-        task.priority = body.get("priority", task.priority)
-
-        if "assigned_to" in body:
-            task.assigned_to = (
-                User.objects.get(id=body["assigned_to"])
-                if body["assigned_to"]
-                else None
-            )
-
-        task.save()
-
-        return JsonResponse({"detail": "Task updated"})
+        return JsonResponse(
+            {"status": "success", "task": task.to_dict()},
+            status=200
+        )
 
     elif request.method == "DELETE":
+        if not can_delete_task(request.user, task):
+            return JsonResponse({"message": "Permission denied"}, status=403)
         task.delete()
-        return JsonResponse({"detail": "Task deleted"})
+        return JsonResponse(
+            {"status": "success", "message": "Task deleted"},
+            status=200
+        )
 
     return HttpResponseNotAllowed(["GET", "PUT", "PATCH", "DELETE"])
+
+
+
+# from django.contrib.auth import get_user_model
+
+# User = get_user_model()
+
+# assigned_to = User.objects.get(id=body["assigned_to"])
