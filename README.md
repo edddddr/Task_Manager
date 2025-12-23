@@ -67,6 +67,8 @@ This project is designed as a **learning-focused, production-style MVP**, emphas
 - Session-based authentication
 - Permission checks via:
   - Django permissions
+  - Custom permission logic (`core/permissions.py`)
+  - Authorization -> Role Vased Access Controle
 
 ---
 

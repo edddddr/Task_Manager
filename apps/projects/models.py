@@ -1,5 +1,7 @@
 from django.db import models
-from django.conf import settings # Reusable app for user
+from django.conf import settings
+
+from apps.projects.managers import ProjectManager # Reusable app for user
 
 
 
@@ -11,8 +13,7 @@ class Project(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return self.name
+    
 
 
     @classmethod
@@ -56,4 +57,18 @@ class Project(models.Model):
             "created_at": self.created_at,
             "updated_at": self.updated_at,
         }
+        
+
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['created_by']),
+            models.Index(fields=['created_at']),
+        ]
+        
+    objects = ProjectManager()
+    
+    def __str__(self):
+            return self.name
+
 
