@@ -8,6 +8,9 @@ class TaskQuerySet(models.QuerySet):
 
     def assigned(self):
         return self.filter(assigned_to__isnull=False)
+    
+    def with_assignee(self):
+        return self.prefetch_related("assigned_to")
 
     def for_user(self, user):
         """

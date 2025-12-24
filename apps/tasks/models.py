@@ -31,24 +31,7 @@ class Task(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-
-
-    @classmethod
-    def create_task(cls, *, project, data):
-        task = cls.objects.create(
-            title=data["title"],
-            description=data.get("description", ""),
-            status=data.get("status", "todo"),
-            priority=data.get("priority", "medium"),
-            project=project,
-            due_date=data.get("due_date"),
-        )
-
-        if data.get("assigned_to"):
-            task.assigned_to.set(
-                User.objects.filter(id__in=data["assigned_to"])
-            )
-        return task
+    objects = TaskManager()
 
     def update_task(self, data):
         self.title = data.get("title", self.title)
@@ -88,7 +71,7 @@ class Task(models.Model):
             # models.Index(fields=['created_by']),
         ]
 
-    objects = TaskManager()
+
 
     def __str__(self):
         return self.title

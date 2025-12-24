@@ -14,7 +14,7 @@ from .models import Project
 def project_list_create(request):
 
     if request.method == "GET":
-        projects = Project.objects.all()
+        projects = Project.objects.active().with_tasks()
         data = [project.to_dict() for project in projects] # List a projects wiht custome an instance method
         return JsonResponse(data, safe=False)
     
@@ -80,3 +80,5 @@ def project_detail(request, project_id):
         return JsonResponse({"status" : "sucess", "message":"Project was deleted successfully"}, status=200)
     else:
         return HttpResponseNotAllowed(["GET", "PUT", "PATCH", "DELETE"])
+
+

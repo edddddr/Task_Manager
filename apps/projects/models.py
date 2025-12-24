@@ -10,24 +10,11 @@ class Project(models.Model):
     description = models.TextField(blank=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='created_projects')
     members = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='projects')
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    
-
-
-    @classmethod
-    def create_project(cls, *, name, description, creator):
-        """
-        Factory method for creating a project.
-        """
-        project = cls.objects.create(
-            name=name,
-            description=description,
-            created_by=creator
-        )
-        project.members.add(creator)
-        return project
+    objects = ProjectManager()
 
 
 
@@ -66,7 +53,7 @@ class Project(models.Model):
             models.Index(fields=['created_at']),
         ]
         
-    objects = ProjectManager()
+    
     
     def __str__(self):
             return self.name

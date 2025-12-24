@@ -17,7 +17,7 @@ def task_list_create(request, project_id):
     project = get_object_or_404(Project, id=project_id)
 
     if request.method == "GET":
-        tasks = project.tasks.all()
+        tasks = Task.objects.for_project(project).with_assignee()
         return JsonResponse(
             {
                 "status": "success",
