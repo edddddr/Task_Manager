@@ -14,20 +14,18 @@ from .models import Project
 def project_list_create(request):
 
     if request.method == "GET":
-        projects = Project.objects.active().with_tasks()
+        projects = Project.objects.for_user(request.user).with_tasks()
         data = [project.to_dict() for project in projects] # List a projects wiht custome an instance method
         return JsonResponse(data, safe=False)
     
     elif request.method == "POST":
-        if not is_admin(request.user) or not is_manager(request.user): # confirm the crater is weather the admin or manager
-            return JsonResponse({"message": "Permission denied"}, status=403)
         try:
             body = json.loads(request.body)
 
-            project = Project.create_project(
+            project = Project.objects.create_project_for_user(
+                user=request.user,
                 name=body.get("name"),
-                description=body.get("description", ""),
-                creator=request.user
+                description=body.get("description", "")
             ) # Create a project with custome class based method
 
             return JsonResponse(
@@ -35,11 +33,11 @@ def project_list_create(request):
                 status=201
             )
 
+        except PermissionError as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=403)
+
         except Exception as e:
-            return JsonResponse(
-                {"status": "error", "message": str(e)},
-                status=400
-            )
+            return JsonResponse({"status": "error", "message": str(e)}, status=400)
 
     return HttpResponseNotAllowed(["GET", "POST"])
 
@@ -49,7 +47,7 @@ def project_list_create(request):
 @ajax_login_required
 @csrf_exempt
 def project_detail(request, project_id):
-    project = get_object_or_404(Project, id=project_id)
+    project = get_object_or_404(Project.objects.for_user(request.user), id=project_id)
 
     if request.method == "GET":
         return JsonResponse(project.to_dict()) #List a project wiht custome instance method

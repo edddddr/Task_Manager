@@ -14,10 +14,19 @@ class TaskQuerySet(models.QuerySet):
 
     def for_user(self, user):
         """
-        Tasks assigned to a user.
-        Uses M2M JOIN efficiently.
+        Return tasks visible to the user.
+        - Admin sees all
+        - Manager sees tasks in projects they created or are member of
+        - Member sees only tasks assigned to them
         """
-        return self.filter(assigned_to=user)
+        if user.is_admin:
+            return self
+        elif user.is_manager:
+            return self.filter(
+                models.Q(project__created_by=user) | models.Q(project__members=user)
+            )
+        else:  # member
+            return self.filter(assigned_to=user)
 
     def by_status(self, status):
         return self.filter(status=status)

@@ -22,13 +22,17 @@ class ProjectQuerySet(models.QuerySet):
     
     def for_user(self, user):
         """
-        Return projects visible to a user.
-        Logical optimization: filter early.
+        Return projects visible to the given user.
+        - Admin sees all
+        - Manager sees all projects they created or are member of
+        - Member sees only projects they are a member of
         """
-        return self.filter(
-            Q(created_by=user) |
-            Q(members=user)
-        ).distinct()
+        if user.is_admin:
+            return self.active()
+        elif user.is_manager:
+            return self.active().filter(models.Q(created_by=user) | models.Q(members=user))
+        else:  # member
+            return self.active().filter(members=user)
 
     def with_members(self):
         """
