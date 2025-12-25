@@ -2,14 +2,15 @@ import json
 from django.http import JsonResponse, HttpResponseNotAllowed, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from core.decorators import ajax_login_required, role_required
-from core.permissions import can_edit_project, is_admin, is_manager
-from .models import Project
+from common.decorators import ajax_login_required, role_required
+from common.permissions import can_edit_project, is_admin, is_manager
+from .models.project import Project
+from apps.projects.services import ProjectService
+from apps.system.models.activity_log import ActivityLog
 
-# List & Create Projects
+
+
 @ajax_login_required
-# This decoration can be used here, but in the case of getting projects for members have a permission.
-# @role_required(["admin", "manager"]) 
 @csrf_exempt 
 def project_list_create(request):
 
@@ -22,11 +23,10 @@ def project_list_create(request):
         try:
             body = json.loads(request.body)
 
-            project = Project.objects.create_project_for_user(
+            project =ProjectService.create_project(
                 user=request.user,
-                name=body.get("name"),
-                description=body.get("description", "")
-            ) # Create a project with custome class based method
+                data=body
+            )
 
             return JsonResponse(
                 {"status": "success", "project": project.to_dict()},
@@ -43,7 +43,6 @@ def project_list_create(request):
 
 
 
-# Retrieve, Update, Delete Project
 @ajax_login_required
 @csrf_exempt
 def project_detail(request, project_id):
@@ -54,17 +53,16 @@ def project_detail(request, project_id):
 
 
     elif request.method in ["PUT", "PATCH"]:
-        if not can_edit_project(request.user, project): # 
-            return JsonResponse({"message": "Permission denied"}, status=403)
         try:
             body = json.loads(request.body)
-            project.update_project(
-                name=body.get("name"),
-                description=body.get("description")
+            ProjectService.update_project(
+                project=project,
+                user=request.user,
+                data=body
             )
             return JsonResponse(
                 {"status": "success", "project": project.to_dict()},
-                status=200
+                status=200  
             )
         except Exception as e:
             return JsonResponse({"status" : "error", "message": str(e)}, status=400)
@@ -80,3 +78,12 @@ def project_detail(request, project_id):
         return HttpResponseNotAllowed(["GET", "PUT", "PATCH", "DELETE"])
 
 
+@ajax_login_required
+def project_activity(request, project_id):
+    if request.method != "GET":
+        return HttpResponseNotAllowed(["GET"])
+
+    project = get_object_or_404(Project, id=project_id)
+    logs = ActivityLog.objects.filter(project=project).order_by("-created_at")
+    data = [log.to_dict() for log in logs]
+    return JsonResponse({"status": "success", "activity": data}, safe=False, status=200)
