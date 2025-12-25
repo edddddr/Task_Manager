@@ -47,7 +47,7 @@ This project is designed as a **learning-focused, production-style MVP**, emphas
 │   ├── tasks/
 │   ├── projects/
 │
-├── core/
+├── common/
 │   ├── permissions.py
 │   ├── mixins.py
 │   ├── utils.py
