@@ -1,0 +1,99 @@
+[
+{
+    "model": "sessions.session",
+    "pk": "e6ks02v9mmue5ibbmljdimnq896ufpqc",
+    "fields": {
+        "session_data": ".eJxVjEEOwiAQRe_C2hCRcSgu3XsGAsyMVA0kpV0Z726bdKHb_977bxXiMpewdJ7CSOqirDr8binmJ9cN0CPWe9O51Xkak94UvdOub434dd3dv4MSe1lrsCeghAkIMwx4hiM6IyjeoedEZMVQNgIDYPKRBRzbNcjIIs45Vp8v4ww4ig:1vXOJ2:O5IPfPpPu83-65Vu2MHPnksn1ghMbUC_55WfKckoTrY",
+        "expire_date": "2026-01-04T18:37:24.474Z"
+    }
+},
+{
+    "model": "users.user",
+    "fields": {
+        "password": "pbkdf2_sha256$1200000$VP6DwgpsyPAzbZWc24OdhP$FxHf3OxZ1qyZ50imWdRQcm9VTdQOa56yBgPz9TuZ2MA=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "User1",
+        "email": "user1email@example.com",
+        "first_name": "user1Firstname",
+        "last_name": "user1Lastname",
+        "is_active": true,
+        "is_staff": false,
+        "date_joined": "2025-12-21T11:03:58.568Z",
+        "role": "manager",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "users.user",
+    "fields": {
+        "password": "pbkdf2_sha256$1200000$TDUeGJfuYYWWqf8uec1aHT$UTdoYLUv6kYo7oTMeJue3+GT+VISdZAy3jG0EbmrhXs=",
+        "last_login": "2025-12-21T18:35:40.345Z",
+        "is_superuser": false,
+        "username": "User2",
+        "email": "user2email@example.com",
+        "first_name": "user2Firstname",
+        "last_name": "user2Lastname",
+        "is_active": true,
+        "is_staff": false,
+        "date_joined": "2025-12-21T11:04:36.419Z",
+        "role": "admin",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "users.user",
+    "fields": {
+        "password": "pbkdf2_sha256$1200000$0uE88Mf6qGYDBVs1KIiRbL$UmKg8lI2D8yiJbUO3psBvgQquUNA1mSa0d9nvnqEFSI=",
+        "last_login": "2025-12-21T18:37:24.451Z",
+        "is_superuser": false,
+        "username": "User3",
+        "email": "user3email@example.com",
+        "first_name": "user3Firstname",
+        "last_name": "user3Lastname",
+        "is_active": true,
+        "is_staff": false,
+        "date_joined": "2025-12-21T11:06:37.961Z",
+        "role": "member",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "tasks.task",
+    "pk": 1,
+    "fields": {
+        "title": "task 1 is edited",
+        "description": "task 1 description",
+        "status": "todo",
+        "priority": "medium",
+        "project": 1,
+        "assigned_to": [
+            "User3"
+        ],
+        "due_date": null,
+        "created_at": "2025-12-21T19:07:32.744Z",
+        "updated_at": "2025-12-21T19:30:22.067Z"
+    }
+},
+{
+    "model": "projects.project",
+    "pk": 1,
+    "fields": {
+        "name": "Project 1",
+        "description": "Project 1  description",
+        "created_by": [
+            "User3"
+        ],
+        "created_at": "2025-12-21T18:40:19.975Z",
+        "updated_at": "2025-12-21T18:40:19.975Z",
+        "members": [
+            [
+                "User3"
+            ]
+        ]
+    }
+}
+]

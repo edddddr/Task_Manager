@@ -2,11 +2,13 @@ import json
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from core.decorators import ajax_login_required
-from core.permissions import can_delete_task, can_edit_task, is_admin, is_manager
+from apps.system.models.activity_log import ActivityLog
+from apps.tasks.services import TaskService
+from common.decorators import ajax_login_required
+from common.permissions import can_delete_task, can_edit_task, is_admin, is_manager
 
-from .models import Task
-from apps.projects.models import Project
+from .models.task import Task
+from apps.projects.models.project import Project
 
 
 
@@ -16,8 +18,8 @@ from apps.projects.models import Project
 def task_list_create(request, project_id):
     project = get_object_or_404(Project, id=project_id)
 
-    if request.method == "GET":
-        tasks = project.tasks.all()
+    if request.method == "GET":                       
+        tasks = Task.objects.for_user(request.user).for_project(project)
         return JsonResponse(
             {
                 "status": "success",
@@ -27,10 +29,17 @@ def task_list_create(request, project_id):
         )
 
     elif request.method == "POST":
-        if not is_admin(request.user) or not is_manager(request.user): # confirm the crater is weather the admin or manager
-            return JsonResponse({"message": "Permission denied"}, status=403)
-        body = json.loads(request.body)
-        task = Task.create_task(project=project, data=body)
+
+        try:
+            data = json.loads(request.body)
+            task = TaskService.create_task(user =request.user, project=project, data=data)
+        
+        except PermissionError as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=403)
+
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=400)
+
 
         return JsonResponse(
             {
@@ -48,7 +57,7 @@ def task_list_create(request, project_id):
 @ajax_login_required
 @csrf_exempt
 def task_detail(request, task_id):
-    task = get_object_or_404(Task, id=task_id)
+    task = get_object_or_404(Task.objects.for_user(request.user), id=task_id)
 
     if request.method == "GET":
         return JsonResponse(
@@ -57,11 +66,9 @@ def task_detail(request, task_id):
         )
 
     elif request.method in ["PUT", "PATCH"]:
-        if not can_edit_task(request.user, task):
-             return JsonResponse({"message": "Permission denied"}, status=403)
 
-        body = json.loads(request.body)
-        task.update_task(body)
+        data = json.loads(request.body)
+        task.update_task(task=task, user=request.user, data=data)
 
         return JsonResponse(
             {"status": "success", "task": task.to_dict()},
@@ -80,9 +87,12 @@ def task_detail(request, task_id):
     return HttpResponseNotAllowed(["GET", "PUT", "PATCH", "DELETE"])
 
 
+@ajax_login_required
+def task_activity(request, task_id):
+    if request.method != "GET":
+        return HttpResponseNotAllowed(["GET"])
 
-# from django.contrib.auth import get_user_model
-
-# User = get_user_model()
-
-# assigned_to = User.objects.get(id=body["assigned_to"])
+    task = get_object_or_404(Task, id=task_id)
+    logs = ActivityLog.objects.filter(task=task).order_by("-created_at")
+    data = [log.to_dict() for log in logs]
+    return JsonResponse({"status": "success", "activity": data}, safe=False, status=200)

@@ -41,6 +41,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
 
+    @property
+    def is_admin(self):
+        return self.role == "admin" or self.is_superuser
+
+    @property
+    def is_manager(self):
+        return self.role == "manager"
+
     def __str__(self):
         return self.username
 
