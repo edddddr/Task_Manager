@@ -1,3 +1,7 @@
+
+from django.core.exceptions import PermissionDenied
+
+
 def is_admin(user):
     return user.is_authenticated and user.role == "admin"
 
@@ -36,3 +40,6 @@ def can_delete_task(user, task):
     return False
 
 
+def require(condition: bool, message="Permission denied"):
+    if not condition:
+        raise PermissionDenied(message)

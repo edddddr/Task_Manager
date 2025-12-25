@@ -21,7 +21,9 @@ INSTALLED_APPS = [
     
     'apps.users.apps.UsersConfig',
     'apps.tasks.apps.TasksConfig',
-    'apps.projects.apps.ProjectsConfig' 
+    'apps.projects.apps.ProjectsConfig',
+    'apps.system.apps.SystemConfig' 
+    
 ]
 
 # MIDDLEWARE

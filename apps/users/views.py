@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from core.decorators import ajax_login_required
+from common.decorators import ajax_login_required
 from django.views.decorators.http import require_POST
 from apps.users.models import User
 
