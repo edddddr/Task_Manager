@@ -11,7 +11,7 @@ def log_task_save(sender, instance, created, **kwargs):
     action = "TASK_CREATED" if created else "TASK_UPDATED"
 
     ActivityLog.objects.create(
-        user=instance.updated_by or instance.created_by,
+        actor=instance.updated_by or instance.created_by,
         action=action,
         content_type=ContentType.objects.get_for_model(Task),
         object_id=instance.id,
@@ -27,7 +27,7 @@ def log_task_save(sender, instance, created, **kwargs):
 @receiver(pre_delete, sender=Task)
 def log_task_delete(sender, instance, **kwargs):
     ActivityLog.objects.create(
-        user=instance.updated_by,
+        actor=instance.updated_by,
         action="TASK_DELETED",
         content_type=ContentType.objects.get_for_model(Task),
         object_id=instance.id,

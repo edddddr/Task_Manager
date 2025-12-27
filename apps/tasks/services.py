@@ -3,6 +3,7 @@ from common.permissions import require
 from .models.task import Task
 from .models.assignment import Assignment
 from .models.status_history import StatusHistory
+from django.core.exceptions import PermissionDenied
 
 
 
@@ -69,3 +70,31 @@ class TaskService:
             )
 
         return task
+
+    @staticmethod
+    @transaction.atomic
+    def assign_task(*, task: Task, user, assignee) -> Task:
+        """
+        Assign a task to a project member.
+
+        Rules:
+        - user must be a project member
+        - assignee must be a project member
+        """
+
+        require(
+            user.is_admin or  task.project.owner == user
+            or task.assignments.filter(user=user).exists(),
+            "You do not have permission to update this task"
+        )   
+
+        Assignment.objects.create(
+                task=task,
+                user=assignee,
+                created_by=user,
+            )
+
+        return task
+
+
+

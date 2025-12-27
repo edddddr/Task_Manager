@@ -1,10 +1,14 @@
 from django.db import models
 from apps.projects.models.querysets import ProjectQuerySet
+from apps.system.models.base_models import SoftDeleteQuerySet
 
 
 class ProjectManager(models.Manager):
     def get_queryset(self):
-        return ProjectQuerySet(self.model, using=self._db)
+        return ProjectQuerySet(self.model, using=self._db).active()
+    # def get_queryset(self):
+    #     return SoftDeleteQuerySet(self.model, using=self._db).active()
+    
     
     def active(self):
         return self.get_queryset().active()

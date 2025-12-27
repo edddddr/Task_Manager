@@ -44,33 +44,33 @@ class Task(SoftDeleteModel, AuditModel):
 
     objects = TaskManager()
 
-    def update_task(self, data, *, user=None):
-        old_status = self.status
+    # def update_task(self, data, *, user=None):
+    #     old_status = self.status
 
-        self.title = data.get("title", self.title)
-        self.description = data.get("description", self.description)
-        self.status = data.get("status", self.status)
-        self.priority = data.get("priority", self.priority)
+    #     self.title = data.get("title", self.title)
+    #     self.description = data.get("description", self.description)
+    #     self.status = data.get("status", self.status)
+    #     self.priority = data.get("priority", self.priority)
 
-        if "assigned_to" in data:
-            self.assigned_to = (
-                User.objects.get(id=data["assigned_to"])
-                if data["assigned_to"]
-                else None
-            )
+    #     if "assigned_to" in data:
+    #         self.assigned_to = (
+    #             User.objects.get(id=data["assigned_to"])
+    #             if data["assigned_to"]
+    #             else None
+    #         )
 
-        self.save()
+    #     self.save()
         
-        if old_status != self.status:
-            ActivityLog.objects.create(
-                user=user,
-                action="TASK_STATUS_CHANGED",
-                content_object=self,
-                metadata={
-                    "from": old_status,
-                    "to": self.status,
-                },
-            )
+    #     if old_status != self.status:
+    #         ActivityLog.objects.create(
+    #             actor=user,
+    #             action="TASK_STATUS_CHANGED",
+    #             content_object=self,
+    #             metadata={
+    #                 "from": old_status,
+    #                 "to": self.status,
+    #             },
+    #         )
 
     def to_dict(self):
         return {
@@ -80,7 +80,7 @@ class Task(SoftDeleteModel, AuditModel):
             "status": self.status,
             "priority": self.priority,
             "project": self.project.id,
-            "assigned_to":[user.id for user in self.assigned_to .all()],
+            # "assigned_to":[user.id for user in self.assigned_to .all()],
             "due_date": self.due_date,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
