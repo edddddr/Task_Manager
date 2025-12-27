@@ -13,3 +13,4 @@ class Comment(SoftDeleteModel, AuditModel):
 
     def __str__(self):
         return f"Comment on {self.task_id}"
+    

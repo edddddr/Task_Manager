@@ -16,7 +16,7 @@ class ActivityLog(models.Model):
         ("TASK_ASSIGNED", "Task assigned"),
     ]
 
-    user = models.ForeignKey(
+    actor = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,

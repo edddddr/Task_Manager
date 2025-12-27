@@ -8,7 +8,7 @@ from django.views.decorators.http import require_POST
 from apps.users.models import User
 
 
-@csrf_exempt
+
 def register(request):
     if request.method != "POST":
         return JsonResponse({"error": "POST required"}, status=405)
@@ -55,7 +55,7 @@ def register(request):
 
 
 
-@csrf_exempt
+
 @require_POST
 def login_view(request):
 
@@ -76,14 +76,12 @@ def login_view(request):
 
 @ajax_login_required
 @require_POST
-@csrf_exempt
 def logout_view(request):
     logout(request)
     return JsonResponse({'status': 'success', 'message': 'Logged out successfully'})
 
 
 # @ajax_login_required
-@csrf_exempt
 def user_list(request):
     users = User.objects.all().values(
         "id", "username", "email", "first_name", "last_name", "role"

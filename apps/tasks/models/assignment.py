@@ -16,6 +16,12 @@ class Assignment(AuditModel):
         related_name="assignments",
     )
 
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="assignments",
+    )
+
     class Meta:
         constraints = [
             models.UniqueConstraint(
