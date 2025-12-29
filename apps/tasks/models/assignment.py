@@ -7,7 +7,7 @@ class Assignment(AuditModel):
     task = models.ForeignKey(
         "tasks.Task",
         on_delete=models.CASCADE,
-        related_name="assignments",
+        related_name="tasks",
     )
 
     user = models.ForeignKey(
@@ -19,7 +19,7 @@ class Assignment(AuditModel):
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="assignments",
+        related_name="created_by",
     )
 
     class Meta:

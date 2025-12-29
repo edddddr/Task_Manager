@@ -1,3 +1,4 @@
+import logging
 import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -6,15 +7,17 @@ from django.contrib.auth.decorators import login_required
 from common.decorators import ajax_login_required
 from django.views.decorators.http import require_POST
 from apps.users.models import User
+# from ratelimit.decorators import ratlimiter pip v3.11
 
+logger = logging.getLogger(__name__)
 
-
+@csrf_exempt
 def register(request):
     if request.method != "POST":
         return JsonResponse({"error": "POST required"}, status=405)
 
     data = json.loads(request.body)
-
+    
     username = data.get("username")
     email = data.get("email")
     password = data.get("password")
@@ -22,7 +25,7 @@ def register(request):
     last_name = data.get("last_name")
     role = data.get("role")
 
-    if not username or not email or not password or not first_name or not last_name:
+    if not username or not email or not password or not first_name or not last_name or not role:
         return JsonResponse(
             {'status': 'error', 'message': 'You missed one of the fields'}, status=400
         )
@@ -53,34 +56,55 @@ def register(request):
         )
 
 
-
-
-
+# @ratelimit(key="ip", rate="5/m", block=True) pip v3.11
+@csrf_exempt
 @require_POST
 def login_view(request):
-
+    
     data = json.loads(request.body)
+    ip = request.META.get("REMOTE_ADDR")
+
     username = data.get("username")
     password = data.get("password")
 
     user = authenticate(request, username=username, password=password)
-
     if user is None:
+        logger.warning(
+            "login_failed",
+            extra={
+                "username": username,
+                "ip": ip,
+            }
+        )
         return JsonResponse({"status": "error", "message": "Invalid credentials"}, status=401)
 
     login(request, user)
+    logger.info(
+        "user_login",
+        extra={
+            "user_id": user.id,
+            "ip": ip,
+        },
+    )
 
     return JsonResponse({'status': 'success', 'message': 'Logged in successfully'})
 
 
-
+@csrf_exempt
 @ajax_login_required
 @require_POST
-def logout_view(request):
+def logout_view(request, user_id):
     logout(request)
+    logger.info(
+        "user_login",
+        extra={
+            "user_id": user_id,
+            "ip": request.META.get("REMOTE_ADDR"),
+        },
+    )
     return JsonResponse({'status': 'success', 'message': 'Logged out successfully'})
 
-
+@csrf_exempt
 # @ajax_login_required
 def user_list(request):
     users = User.objects.all().values(

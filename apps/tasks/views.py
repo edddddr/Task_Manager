@@ -1,3 +1,6 @@
+import logging
+from django.core.cache import cache
+
 import json
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404
@@ -10,7 +13,7 @@ from common.permissions import can_delete_task, can_edit_task, is_admin, is_mana
 from .models.task import Task
 from apps.projects.models.project import Project
 
-
+logger = logging.getLogger(__name__)
 
 
 @ajax_login_required
@@ -18,12 +21,26 @@ from apps.projects.models.project import Project
 def task_list_create(request, project_id):
     project = get_object_or_404(Project, id=project_id)
 
+    cached_task = cache.get('task_list') 
+
     if request.method == "GET":                       
+        if cached_task:
+            print(" ################### R%%%%%%%%%% ####", cached_task)
+            return JsonResponse(
+            {
+                "status": "success",
+                "tasks": cached_task,
+            },
+            status=200
+        )
         tasks = Task.objects.for_user(request.user).for_project(project)
+        data = [task.to_dict() for task in tasks]
+
+        cache.set('task_list', data, timeout=60*10)
         return JsonResponse(
             {
                 "status": "success",
-                "tasks": [task.to_dict() for task in tasks],
+                "tasks": data,
             },
             status=200
         )
@@ -76,8 +93,18 @@ def task_detail(request, task_id):
         )
 
     elif request.method == "DELETE":
-        if not can_delete_task(request.user, task):
+        user = request.user
+        if not can_delete_task(user, task):
             return JsonResponse({"message": "Permission denied"}, status=403)
+       
+        logger.info(
+            "task_delete",
+            extra={
+                "taskt_id": task.id,
+                "project_id": task.project.id,
+                "user_id": user.id,
+            }
+        )
         task.delete()
         return JsonResponse(
             {"status": "success", "message": "Task deleted"},

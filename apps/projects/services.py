@@ -1,8 +1,11 @@
+import logging
+
 from django.db import transaction
 from django.core.exceptions import PermissionDenied
 from .models.project import Project
 from common.permissions import require
 
+logger = logging.getLogger(__name__)
 
 class ProjectService:
 
@@ -22,6 +25,13 @@ class ProjectService:
 
         # Owner is always a member
         project.members.add(user)
+        logger.info(
+            "project_created",
+            extra={
+                "project_id": project.id,
+                "user_id": user.id,
+            }
+        )
 
         return project
 
@@ -41,5 +51,12 @@ class ProjectService:
 
         project.updated_by = user
         project.save()
+        logger.info(
+            "project_updated",
+            extra={
+                "project_id": project.id,
+                "user_id": user.id,
+            }
+        )
 
         return project

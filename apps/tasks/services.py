@@ -1,11 +1,12 @@
+import logging
+
 from django.db import transaction
 from common.permissions import require
 from .models.task import Task
 from .models.assignment import Assignment
 from .models.status_history import StatusHistory
-from django.core.exceptions import PermissionDenied
 
-
+logger = logging.getLogger(__name__)
 
 class TaskService:
 
@@ -38,6 +39,14 @@ class TaskService:
                 user_id=assignee_id,
                 created_by=user,
             )
+        logger.info(
+            "task_created",
+            extra={
+                "taskt_id": task.id,
+                "project_id": project.id,
+                "user_id": user.id,
+            }
+        )
 
         return task
 
@@ -68,6 +77,14 @@ class TaskService:
                 new_status=task.status,
                 created_by=user,
             )
+        logger.info(
+            "task_updated",
+            extra={
+                "taskt_id": task.id,
+                "project_id": task.project.id,
+                "user_id": user.id,
+            }
+        )
 
         return task
 

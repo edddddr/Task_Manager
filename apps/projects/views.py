@@ -1,22 +1,31 @@
+import logging
+from django.core.cache import cache
+
 import json
 from django.http import JsonResponse, HttpResponseNotAllowed, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from common.decorators import ajax_login_required, role_required
-from common.permissions import can_edit_project, is_admin, is_manager
+from common.decorators import ajax_login_required
+from common.permissions import is_admin
 from .models.project import Project
 from apps.projects.services import ProjectService
 from apps.system.models.activity_log import ActivityLog
 
+logger = logging.getLogger("task_manager")
 
 
 @ajax_login_required
 @csrf_exempt 
 def project_list_create(request):
 
+    cached_project = cache.get("projects_list")
     if request.method == "GET":
+        if cached_project:
+            return JsonResponse(cached_project, safe=False)
         projects = Project.objects.for_user(request.user).with_tasks()
+
         data = [project.to_dict() for project in projects] # List a projects wiht custome an instance method
+        cache.set("projects_list", data, timeout=60*10)
         return JsonResponse(data, safe=False)
     
     elif request.method == "POST":
@@ -27,6 +36,7 @@ def project_list_create(request):
                 user=request.user,
                 data=body
             )
+            cache.delete("projects_list")
 
             return JsonResponse(
                 {"status": "success", "project": project.to_dict()},
@@ -60,6 +70,7 @@ def project_detail(request, project_id):
                 user=request.user,
                 data=body
             )
+            cache.delete("projects_list")
             return JsonResponse(
                 {"status": "success", "project": project.to_dict()},
                 status=200  
@@ -68,9 +79,19 @@ def project_detail(request, project_id):
             return JsonResponse({"status" : "error", "message": str(e)}, status=400)
 
     elif request.method == "DELETE":
-        if not is_admin(request.user): # confirm the crater is weather the admin or manager
+        user = request.user
+        if not is_admin(user): # confirm the acter is weather the admin or the manager
             return JsonResponse({"message": "Permission denied"}, status=403)
-
+        print('\n')
+        print('\n')
+        print('\n')
+        logger.info(
+            "project_deleted",
+            extra={
+                "project_id": project.id,
+                "user_id": user.id,
+            }
+        )
         project.delete()
 
         return JsonResponse({"status" : "sucess", "message":"Project was deleted successfully"}, status=200)
