@@ -1,33 +1,39 @@
-# config/settings/prod.py
 from .base import *
+import os
+import dj_database_url
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+from decouple import config
+from dotenv import load_dotenv
+    
+
+load_dotenv()
 
 DEBUG = False
-ALLOWED_HOSTS = ['yourdomain.com']
 
-# Production database credentials
-DATABASES['default']['NAME'] = os.getenv('DB_NAME', 'task_manager')
-DATABASES['default']['USER'] = os.getenv('DB_USER')
-DATABASES['default']['PASSWORD'] = os.getenv('DB_PASSWORD')
-DATABASES['default']['HOST'] = os.getenv('DB_HOST', 'db')
-DATABASES['default']['PORT'] = os.getenv('DB_PORT', 5432)
+ALLOWED_HOSTS = os.getenv(
+    "ALLOWED_HOSTS",
+    "localhost,127.0.0.1"
+).split(",")
 
-# Email backend for production
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = os.getenv('EMAIL_HOST')
-EMAIL_PORT = os.getenv('EMAIL_PORT', 587)
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.getenv('EMAIL_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASSWORD')
+SECRET_KEY = config('SECRET_KEY')
 
-# Security settings
-SECURE_SSL_REDIRECT = True
-SECURE_HSTS_SECONDS = 31536000
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
+DATABASES = {
+    "default": dj_database_url.config(conn_max_age=600)
+}
 
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
 
-X_FRAME_OPTIONS = "DENY"
-SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"
+
+SECURE_SSL_REDIRECT = False
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
+
+sentry_sdk.init(
+    dsn="https://6d0b9f6585106533cebbff123e907f26@o4510616778702848.ingest.us.sentry.io/4510616800854016",
+    integrations=[DjangoIntegration()],
+    traces_sample_rate=0.1,
+    send_default_pii=False,
+)

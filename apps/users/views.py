@@ -11,6 +11,8 @@ from apps.users.models import User
 
 logger = logging.getLogger(__name__)
 
+logger.info("docker_logging_test")
+
 @csrf_exempt
 def register(request):
     if request.method != "POST":
