@@ -7,17 +7,21 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0001_initial'),
+        ("projects", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddIndex(
-            model_name='project',
-            index=models.Index(fields=['created_by'], name='projects_pr_created_c24ee1_idx'),
+            model_name="project",
+            index=models.Index(
+                fields=["created_by"], name="projects_pr_created_c24ee1_idx"
+            ),
         ),
         migrations.AddIndex(
-            model_name='project',
-            index=models.Index(fields=['created_at'], name='projects_pr_created_6b02e3_idx'),
+            model_name="project",
+            index=models.Index(
+                fields=["created_at"], name="projects_pr_created_6b02e3_idx"
+            ),
         ),
     ]

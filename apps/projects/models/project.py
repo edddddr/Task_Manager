@@ -1,9 +1,9 @@
-from django.db import models
 from django.conf import settings
-from apps.system.models.base_models import SoftDeleteModel, AuditModel
+from django.db import models
 
-from apps.projects.models.managers import ProjectManager # Reusable app for user
-
+from apps.projects.models.managers import \
+    ProjectManager  # Reusable app for user
+from apps.system.models.base_models import AuditModel, SoftDeleteModel
 
 
 class Project(SoftDeleteModel, AuditModel):
@@ -21,9 +21,7 @@ class Project(SoftDeleteModel, AuditModel):
         settings.AUTH_USER_MODEL,
         related_name="projects",
         blank=True,
-    )        
-
-
+    )
 
     # created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='created_projects')
     # members = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='projects')
@@ -32,8 +30,6 @@ class Project(SoftDeleteModel, AuditModel):
     # updated_at = models.DateTimeField(auto_now=True)
 
     objects = ProjectManager()
-
-
 
     def update_project(self, *, name=None, description=None):
         """
@@ -45,8 +41,6 @@ class Project(SoftDeleteModel, AuditModel):
             self.description = description
         self.save()
         return self
-
-
 
     def to_dict(self):
         """
@@ -61,13 +55,11 @@ class Project(SoftDeleteModel, AuditModel):
             "created_at": self.created_at,
             "updated_at": self.updated_at,
         }
-        
-
 
     class Meta:
         indexes = [
-            models.Index(fields=['created_by']),
-            models.Index(fields=['created_at']),
+            models.Index(fields=["created_by"]),
+            models.Index(fields=["created_at"]),
         ]
 
         constraints = [
@@ -76,10 +68,6 @@ class Project(SoftDeleteModel, AuditModel):
                 name="unique_project_name_per_owner",
             )
         ]
-        
-    
-    
+
     def __str__(self):
-            return self.name
-
-
+        return self.name

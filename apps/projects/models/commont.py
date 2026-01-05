@@ -1,5 +1,6 @@
 from django.db import models
-from apps.system.models.base_models import SoftDeleteModel, AuditModel
+
+from apps.system.models.base_models import AuditModel, SoftDeleteModel
 
 
 class Comment(SoftDeleteModel, AuditModel):
@@ -13,4 +14,3 @@ class Comment(SoftDeleteModel, AuditModel):
 
     def __str__(self):
         return f"Comment on {self.task_id}"
-    

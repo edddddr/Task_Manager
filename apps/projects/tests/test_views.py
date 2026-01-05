@@ -1,12 +1,15 @@
 import json
+
 import pytest
 from django.urls import reverse
+
 from apps.projects.tests.factories import ProjectFactory
 from apps.users.models import User
 from apps.users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
 BASE_URL = "/api/v1/projects/"
+
 
 def test_get_projects_returns_only_user_projects(client):
     user = UserFactory()
@@ -30,7 +33,6 @@ def test_get_projects_returns_only_user_projects(client):
     project_ids = [p["id"] for p in data]
     assert visible.id in project_ids
     assert hidden.id not in project_ids
-
 
 
 def test_create_project_success(client):
@@ -57,7 +59,7 @@ def test_create_project_success(client):
 def test_delete_project_forbidden_for_non_admin(client):
     """
     Docstring for test_delete_project_forbidden_for_non_admin
-    
+
     :param client: Description
     :type client: Any
     :In the case of the func Project.objects.for_user(request.user) is early if the user have access the data or not.
@@ -65,8 +67,8 @@ def test_delete_project_forbidden_for_non_admin(client):
     """
     admin = UserFactory(role=User.ROLE_ADMIN)
     member = UserFactory(role=User.ROLE_MEMBER)
-    
-    # more professional 
+
+    # more professional
     # admin = UserFactory(admin=True)
     # member = UserFactory()
     project = ProjectFactory(owner=admin)

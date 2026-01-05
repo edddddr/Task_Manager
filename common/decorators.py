@@ -1,5 +1,7 @@
-from django.http import JsonResponse
 from functools import wraps
+
+from django.http import JsonResponse
+
 
 def ajax_login_required(view_func):
     @wraps(view_func)
@@ -8,11 +10,13 @@ def ajax_login_required(view_func):
             # Return your custom JSON response with a 401 (Unauthorized) status
             return JsonResponse(
                 {
-                 'status': 'fail', 
-                 'message': 'You must be logged in to perform this action.'}, 
-                status=401
+                    "status": "fail",
+                    "message": "You must be logged in to perform this action.",
+                },
+                status=401,
             )
         return view_func(request, *args, **kwargs)
+
     return _wrapped_view
 
 
@@ -27,5 +31,7 @@ def role_required(roles):
                 return JsonResponse({"detail": "Permission denied"}, status=403)
 
             return view_func(request, *args, **kwargs)
+
         return wrapper
+
     return decorator

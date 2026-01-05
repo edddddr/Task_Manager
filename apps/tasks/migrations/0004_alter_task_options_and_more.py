@@ -8,46 +8,62 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('tasks', '0003_alter_task_assigned_to'),
+        ("tasks", "0003_alter_task_assigned_to"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='task',
-            options={'ordering': ['-created_at']},
+            name="task",
+            options={"ordering": ["-created_at"]},
         ),
         migrations.RemoveIndex(
-            model_name='task',
-            name='tasks_task_created_be1ba2_idx',
+            model_name="task",
+            name="tasks_task_created_be1ba2_idx",
         ),
         migrations.AddField(
-            model_name='task',
-            name='created_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='created_%(class)s_set', to=settings.AUTH_USER_MODEL),
+            model_name="task",
+            name="created_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="created_%(class)s_set",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='task',
-            name='deleted_at',
+            model_name="task",
+            name="deleted_at",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='task',
-            name='is_active',
+            model_name="task",
+            name="is_active",
             field=models.BooleanField(default=True),
         ),
         migrations.AddField(
-            model_name='task',
-            name='updated_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='updated_%(class)s_set', to=settings.AUTH_USER_MODEL),
+            model_name="task",
+            name="updated_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="updated_%(class)s_set",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='task',
-            name='priority',
-            field=models.CharField(choices=[(1, 'Low'), (2, 'Medium'), (3, 'High')], default='medium', max_length=20),
+            model_name="task",
+            name="priority",
+            field=models.CharField(
+                choices=[(1, "Low"), (2, "Medium"), (3, "High")],
+                default="medium",
+                max_length=20,
+            ),
         ),
         migrations.RemoveField(
-            model_name='task',
-            name='assigned_to',
+            model_name="task",
+            name="assigned_to",
         ),
     ]

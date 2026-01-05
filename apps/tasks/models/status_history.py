@@ -1,4 +1,5 @@
 from django.db import models
+
 from apps.system.models.base_models import AuditModel
 
 

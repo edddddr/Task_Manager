@@ -1,5 +1,9 @@
+import pytest
+
 from apps.projects.models.project import Project
 from apps.projects.tests.factories import ProjectFactory
+
+pytestmark = pytest.mark.django_db
 
 
 def test_project_soft_delete_sets_flag():
@@ -16,6 +20,5 @@ def test_soft_deleted_projects_are_hidden():
     ProjectFactory()
     deleted = ProjectFactory()
     deleted.delete()
-
 
     assert Project.objects.count() == 1

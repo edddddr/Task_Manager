@@ -1,6 +1,10 @@
+import pytest
+
 from apps.projects.models.project import Project
 from apps.projects.tests.factories import ProjectFactory
 from apps.users.tests.factories import UserFactory
+
+pytestmark = pytest.mark.django_db
 
 
 def test_user_sees_only_member_projects():
@@ -16,4 +20,6 @@ def test_user_sees_only_member_projects():
 
     assert project in projects
     assert projects.count() == 1
-# 
+
+
+#

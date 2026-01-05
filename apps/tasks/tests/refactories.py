@@ -1,6 +1,7 @@
 import factory
-from apps.tasks.models.task import Task
+
 from apps.projects.tests.factories import ProjectFactory
+from apps.tasks.models.task import Task
 from apps.users.tests.factories import UserFactory
 
 

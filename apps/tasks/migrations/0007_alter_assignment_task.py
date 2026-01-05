@@ -7,13 +7,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('tasks', '0006_alter_assignment_created_by'),
+        ("tasks", "0006_alter_assignment_created_by"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='assignment',
-            name='task',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='task', to='tasks.task'),
+            model_name="assignment",
+            name="task",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="task",
+                to="tasks.task",
+            ),
         ),
     ]

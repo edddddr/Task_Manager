@@ -1,6 +1,8 @@
 import factory
+
 from apps.projects.models.project import Project
 from apps.users.tests.factories import UserFactory
+
 
 class ProjectFactory(factory.django.DjangoModelFactory):
     class Meta:

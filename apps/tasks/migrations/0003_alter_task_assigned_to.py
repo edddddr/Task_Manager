@@ -7,14 +7,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('tasks', '0002_remove_task_assigned_to_and_more'),
+        ("tasks", "0002_remove_task_assigned_to_and_more"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='task',
-            name='assigned_to',
-            field=models.ManyToManyField(blank=True, related_name='assigned_tasks', to=settings.AUTH_USER_MODEL),
+            model_name="task",
+            name="assigned_to",
+            field=models.ManyToManyField(
+                blank=True, related_name="assigned_tasks", to=settings.AUTH_USER_MODEL
+            ),
         ),
     ]
