@@ -8,10 +8,10 @@ DEBUG = True  # Enable debug mode
 # ALLOWED_HOSTS = ['*']
 
 # Development DB (could use SQLite for simplicity)
-DATABASES['default']['NAME'] = os.getenv('DB_NAME', 'task_manager_dev')
+DATABASES = os.getenv('DB_NAME', 'task_manager_dev')
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(",")
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+# ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 # Email backend for development
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
