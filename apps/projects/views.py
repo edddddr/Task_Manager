@@ -116,13 +116,19 @@ from apps.projects.models.project import Project
 from apps.projects.pagination import ProjectPagination
 from apps.projects.serializers import ProjectSerializer
 from apps.tasks.serializers import TaskSerializer
+from apps.tasks.pagination import TaskPagination
+from rest_framework.throttling import ScopedRateThrottle
+
 
 
 class ProjectViewSet(ModelViewSet):
+    throttle_classes = [ScopedRateThrottle]
+    
     serializer_class = ProjectSerializer
     permission_classes = [IsAuthenticated]
-    # pagination_class = None
     pagination_class = ProjectPagination
+
+    
 
     def get_queryset(self):
         """
@@ -130,6 +136,15 @@ class ProjectViewSet(ModelViewSet):
         Soft-deleted projects excluded by default manager.
         """
         return Project.objects.filter(members=self.request.user)
+    
+    def get_throttle_scope(self):
+        if self.action == "create":
+            return "create_project"
+        if self.action in ["update", "partial_update"]:
+            return "update_project"
+        if self.action == "destroy":
+            return "delete_project"
+        return None
 
     def perform_destroy(self, instance):
         """
@@ -138,25 +153,46 @@ class ProjectViewSet(ModelViewSet):
         instance.delete()
 
     
-    @action(detail=True, methods=["get", "post"], url_path="tasks")
-    def tasks(self, request, pk=None, *args, **kwargs):
-        """
-        /projects/{project_id}/tasks
-        """
+    @action(
+        detail=True,
+        methods=["post"],
+        url_path="tasks",
+        throttle_scope="create_task"
+    )
+    def create_task(self, request, pk=None):
         project = self.get_object()
 
-        # Safety: membership already enforced by get_queryset
-        if request.method == "GET":
-            tasks = project.tasks.all()
-            serializer = TaskSerializer(tasks, many=True)
-            return Response(serializer.data)
+        serializer = TaskSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(project=project)
 
-        if request.method == "POST":
-            serializer = TaskSerializer(
-                data=request.data,
-                context={"request": request},
-            )
-            serializer.is_valid(raise_exception=True)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-            serializer.save(project=project)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    @action(
+        detail=True,
+        methods=["put", "patch"],
+        url_path="tasks/(?P<task_id>[^/.]+)",
+        throttle_scope="update_task",
+    )
+    def update_task(self, request, pk=None, task_id=None):
+        project = self.get_object()
+        task = project.tasks.get(id=task_id)
+
+        serializer = TaskSerializer(task, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data)
+
+    @action(
+        detail=True,
+        methods=["delete"],
+        url_path="tasks/(?P<task_id>[^/.]+)",
+        throttle_scope="delete_task",
+    )
+    def delete_task(self, request, pk=None, task_id=None):
+        project = self.get_object()
+        task = project.tasks.get(id=task_id)
+        task.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)

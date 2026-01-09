@@ -140,11 +140,15 @@ from .models import User
 from .serializers import RegisterSerializer
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+from apps.users.throttles import LogoutThrottle, RegisterThrottle, LoginThrottle
+from rest_framework_simplejwt.views import TokenObtainPairView
+
 
 
 
 class RegisterView(APIView):
     permission_classes = [permissions.AllowAny]
+    throttle_classes = [RegisterThrottle]
 
     def post(self, request, *args, **kwargs):
         serializer = RegisterSerializer(data=request.data)
@@ -161,8 +165,16 @@ class RegisterView(APIView):
         )
 
 
+
+class LoginView(TokenObtainPairView):
+    throttle_classes = [LoginThrottle]
+
+
+
 class LogoutView(APIView):
+    throttle_classes = [LogoutThrottle]
     permission_classes = [IsAuthenticated]
+
 
     def post(self, request, *args, **kwargs):
         try:

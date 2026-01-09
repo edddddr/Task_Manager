@@ -14,22 +14,22 @@ urlpatterns = [
     # path("api/token/", TokenObtainPairView.as_view()),
     # path("api/token/refresh/", TokenRefreshView.as_view()),
 
-    path(
-        "api/<str:version>/auth/login/", 
-        TokenObtainPairView.as_view(), 
-        name="login"
-        ),  
-    path(
-        "api/<str:version>/auth/refresh/", 
-        TokenRefreshView.as_view(), 
-        name="refresh"
-        ),
-    path(
-        "api/<str:version>/auth/logout/",
-        LogoutView.as_view(), 
-        name="logout"
-        ),
-        
+    # 
+        # path(
+    #     "api/<str:version>/auth/login/", 
+    #     TokenObtainPairView.as_view(), 
+    #     name="login"
+    #     ),  
+    # path(
+    #     "api/<str:version>/auth/refresh/", 
+    #     TokenRefreshView.as_view(), 
+    #     name="refresh"
+    #     ),
+    # path(
+    #     "api/<str:version>/auth/logout/",
+    #     LogoutView.as_view(), 
+    #     name="logout"
+    #     ),
     path("api/<str:version>/", include("apps.users.urls")),
     path("api/<str:version>/", include("apps.projects.urls")),
 ]

@@ -132,12 +132,30 @@ REST_FRAMEWORK = {
     # Throttling
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.UserRateThrottle",
-        "rest_framework.throttling.AnonRateThrottle",
-    ],
+        "rest_framework.throttling.AnonRateThrottle",   
+        "rest_framework.throttling.ScopedRateThrottle",
+    ],  
     "DEFAULT_THROTTLE_RATES": {
+        # Baseline
+        "anon": "100/hour",
         "user": "1000/day",
-        "anon": "100/day",
+
+        # Auth
+        "register": "5/minute",
+        "login": "5/minute",
+        "logout": "20/minute",
+
+        # Projects
+        "create_project": "10/day",
+        "update_project": "50/day",
+        "delete_project": "10/day",
+
+        # Tasks
+        "create_task": "20/hour",
+        "update_task": "100/hour",
+        "delete_task": "50/hour",
     },
+    
 
     # Versioning
     "DEFAULT_VERSIONING_CLASS":
