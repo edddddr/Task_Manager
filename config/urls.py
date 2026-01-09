@@ -31,7 +31,7 @@ urlpatterns = [
         ),
         
     path("api/<str:version>/", include("apps.users.urls")),
-    # path("api/<str:version>/", include("projects.urls")),
+    path("api/<str:version>/", include("apps.projects.urls")),
 ]
 # urlpatterns = [
 #     path("admin/", admin.site.urls),

@@ -72,7 +72,6 @@ class Task(SoftDeleteModel, AuditModel):
             "status": self.status,
             "priority": self.priority,
             "project": self.project.id,
-            # "assigned_to":[user.id for user in self.assigned_to .all()],
             "due_date": self.due_date,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
