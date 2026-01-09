@@ -113,6 +113,7 @@ from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from apps.projects.models.project import Project
+from apps.projects.pagination import ProjectPagination
 from apps.projects.serializers import ProjectSerializer
 from apps.tasks.serializers import TaskSerializer
 
@@ -120,7 +121,8 @@ from apps.tasks.serializers import TaskSerializer
 class ProjectViewSet(ModelViewSet):
     serializer_class = ProjectSerializer
     permission_classes = [IsAuthenticated]
-    pagination_class = None
+    # pagination_class = None
+    pagination_class = ProjectPagination
 
     def get_queryset(self):
         """
