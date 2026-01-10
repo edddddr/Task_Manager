@@ -1,4 +1,3 @@
-
 from django.core.exceptions import PermissionDenied
 
 
@@ -19,9 +18,7 @@ def can_edit_project(user, project):
         return True
     if is_manager(user) and project.created_by == user:
         return True
-    return 
-
-
+    return
 
 
 def can_edit_task(user, task):

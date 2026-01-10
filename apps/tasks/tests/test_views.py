@@ -1,13 +1,16 @@
 import json
+
 import pytest
-from apps.tasks.models.task import Task
+
 from apps.projects.tests.factories import ProjectFactory
+from apps.tasks.models.task import Task
 from apps.tasks.tests.refactories import TaskFactory
 from apps.users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
 
-BASE_URL = '/api/v1/projects'
+BASE_URL = "/api/v1/projects"
+
 
 def test_create_task_success(client):
     project = ProjectFactory()

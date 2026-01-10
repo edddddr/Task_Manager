@@ -1,6 +1,6 @@
+from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
-from django.contrib.contenttypes.models import ContentType
 
 from apps.projects.models.project import Project
 from apps.system.models.activity_log import ActivityLog

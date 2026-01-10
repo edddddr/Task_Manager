@@ -4,12 +4,11 @@ from django.db.models import Q
 
 class ProjectQuerySet(models.QuerySet):
     """
-    In Django, models.QuerySet is a collection 
-    of objects from your database. It is the primary 
-    tool used to read, filter, and order data through 
+    In Django, models.QuerySet is a collection
+    of objects from your database. It is the primary
+    tool used to read, filter, and order data through
     Django's Object-Relational Mapping (ORM).
     """
-
 
     def active(self):
         return self.filter(is_active=True)
@@ -19,7 +18,7 @@ class ProjectQuerySet(models.QuerySet):
 
     def with_tasks(self):
         return self.prefetch_related("tasks")
-    
+
     def for_user(self, user):
         """
         Return projects visible to the given user.
@@ -30,7 +29,9 @@ class ProjectQuerySet(models.QuerySet):
         if user.is_admin:
             return self.active()
         elif user.is_manager:
-            return self.active().filter(models.Q(created_by=user) | models.Q(members=user))
+            return self.active().filter(
+                models.Q(created_by=user) | models.Q(members=user)
+            )
         else:  # member
             return self.active().filter(members=user)
 

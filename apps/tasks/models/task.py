@@ -1,10 +1,10 @@
-from django.db  import models
-from django.conf import settings # Reusable app for user
+from django.conf import settings  # Reusable app for user
+from django.db import models
+
 from apps.system.models.activity_log import ActivityLog
+from apps.system.models.base_models import AuditModel, SoftDeleteModel
 from apps.tasks.models.manager import TaskManager
 from apps.users.models import User
-
-from apps.system.models.base_models import AuditModel, SoftDeleteModel
 
 
 class TaskStatus(models.TextChoices):
@@ -12,33 +12,25 @@ class TaskStatus(models.TextChoices):
     IN_PROGRESS = "in_progress", "In Progress"
     DONE = "done", "Done"
 
+
 class TaskPriority(models.IntegerChoices):
     LOW = 1, "Low"
     MEDIUM = 2, "Medium"
     HIGH = 3, "High"
 
 
-
 class Task(SoftDeleteModel, AuditModel):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     project = models.ForeignKey(
-        'projects.Project' ,
-        on_delete=models.CASCADE,
-        related_name='tasks'
-        )# 'projects.Project' This uses lazy loading and avoids circular imports
+        "projects.Project", on_delete=models.CASCADE, related_name="tasks"
+    )  # 'projects.Project' This uses lazy loading and avoids circular imports
 
-    status = models.CharField(
-        max_length=20, 
-        choices=TaskStatus.choices, 
-        default='todo'
-        )
+    status = models.CharField(max_length=20, choices=TaskStatus.choices, default="todo")
     priority = models.CharField(
-        max_length=20, 
-        choices=TaskPriority.choices, 
-        default='medium'
-        )
-    # The relation M2M is transform after evloved to Postgresql 
+        max_length=20, choices=TaskPriority.choices, default="medium"
+    )
+    # The relation M2M is transform after evloved to Postgresql
     # assigned_to = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="assigned_tasks", blank=True)
     due_date = models.DateTimeField(null=True, blank=True)
 
@@ -60,7 +52,7 @@ class Task(SoftDeleteModel, AuditModel):
     #         )
 
     #     self.save()
-        
+
     #     if old_status != self.status:
     #         ActivityLog.objects.create(
     #             actor=user,
@@ -80,7 +72,6 @@ class Task(SoftDeleteModel, AuditModel):
             "status": self.status,
             "priority": self.priority,
             "project": self.project.id,
-            # "assigned_to":[user.id for user in self.assigned_to .all()],
             "due_date": self.due_date,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
@@ -90,11 +81,9 @@ class Task(SoftDeleteModel, AuditModel):
         ordering = ["-created_at"]
         indexes = [
             # 🔹 BTREE indexes (default)
-            models.Index(fields=['status']),
-            models.Index(fields=['project'])
+            models.Index(fields=["status"]),
+            models.Index(fields=["project"]),
         ]
-
-
 
     def __str__(self):
         return self.title

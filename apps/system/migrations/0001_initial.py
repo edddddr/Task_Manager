@@ -10,24 +10,61 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('contenttypes', '0002_remove_content_type_name'),
+        ("contenttypes", "0002_remove_content_type_name"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ActivityLog',
+            name="ActivityLog",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('action', models.CharField(choices=[('PROJECT_CREATED', 'Project created'), ('PROJECT_UPDATED', 'Project updated'), ('PROJECT_DELETED', 'Project deleted'), ('TASK_CREATED', 'Task created'), ('TASK_UPDATED', 'Task updated'), ('TASK_DELETED', 'Task deleted'), ('TASK_STATUS_CHANGED', 'Task status changed'), ('TASK_ASSIGNED', 'Task assigned')], max_length=50)),
-                ('object_id', models.PositiveIntegerField()),
-                ('metadata', models.JSONField(blank=True, default=dict)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('content_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype')),
-                ('user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "action",
+                    models.CharField(
+                        choices=[
+                            ("PROJECT_CREATED", "Project created"),
+                            ("PROJECT_UPDATED", "Project updated"),
+                            ("PROJECT_DELETED", "Project deleted"),
+                            ("TASK_CREATED", "Task created"),
+                            ("TASK_UPDATED", "Task updated"),
+                            ("TASK_DELETED", "Task deleted"),
+                            ("TASK_STATUS_CHANGED", "Task status changed"),
+                            ("TASK_ASSIGNED", "Task assigned"),
+                        ],
+                        max_length=50,
+                    ),
+                ),
+                ("object_id", models.PositiveIntegerField()),
+                ("metadata", models.JSONField(blank=True, default=dict)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "content_type",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="contenttypes.contenttype",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
+                "ordering": ["-created_at"],
             },
         ),
     ]

@@ -1,11 +1,14 @@
 import logging
 
-from django.db import transaction
 from django.core.exceptions import PermissionDenied
-from .models.project import Project
+from django.db import transaction
+
 from common.permissions import require
 
+from .models.project import Project
+
 logger = logging.getLogger(__name__)
+
 
 class ProjectService:
 
@@ -13,7 +16,6 @@ class ProjectService:
     @transaction.atomic
     def create_project(*, user, data):
         require(user.is_authenticated, "Authentication required")
-
 
         project = Project.objects.create(
             name=data["name"],
@@ -30,7 +32,7 @@ class ProjectService:
             extra={
                 "project_id": project.id,
                 "user_id": user.id,
-            }
+            },
         )
 
         return project
@@ -40,10 +42,9 @@ class ProjectService:
     def update_project(*, project, user, data):
         require(
             user.is_admin or project.owner == user,
-            "You do not have permission to update this project"
+            "You do not have permission to update this project",
         )
         print("yes authenticated")
-
 
         for field in ["name", "description"]:
             if field in data:
@@ -56,7 +57,7 @@ class ProjectService:
             extra={
                 "project_id": project.id,
                 "user_id": user.id,
-            }
+            },
         )
 
         return project

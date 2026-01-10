@@ -1,12 +1,15 @@
 import logging
 
 from django.db import transaction
+
 from common.permissions import require
-from .models.task import Task
+
 from .models.assignment import Assignment
 from .models.status_history import StatusHistory
+from .models.task import Task
 
 logger = logging.getLogger(__name__)
+
 
 class TaskService:
 
@@ -17,7 +20,7 @@ class TaskService:
             user.is_admin
             or project.owner == user
             or project.members.filter(id=user.id).exists(),
-            "You do not have permission to create tasks in this project"
+            "You do not have permission to create tasks in this project",
         )
 
         task = Task.objects.create(
@@ -45,19 +48,19 @@ class TaskService:
                 "taskt_id": task.id,
                 "project_id": project.id,
                 "user_id": user.id,
-            }
+            },
         )
 
         return task
 
     @staticmethod
     @transaction.atomic
-    def update_task(*, task, user, data): 
+    def update_task(*, task, user, data):
         require(
             user.is_admin
             or task.project.owner == user
             or task.assignments.filter(user=user).exists(),
-            "You do not have permission to update this task"
+            "You do not have permission to update this task",
         )
 
         old_status = task.status
@@ -83,7 +86,7 @@ class TaskService:
                 "taskt_id": task.id,
                 "project_id": task.project.id,
                 "user_id": user.id,
-            }
+            },
         )
 
         return task
@@ -100,18 +103,16 @@ class TaskService:
         """
 
         require(
-            user.is_admin or  task.project.owner == user
+            user.is_admin
+            or task.project.owner == user
             or task.assignments.filter(user=user).exists(),
-            "You do not have permission to update this task"
-        )   
+            "You do not have permission to update this task",
+        )
 
         Assignment.objects.create(
-                task=task,
-                user=assignee,
-                created_by=user,
-            )
+            task=task,
+            user=assignee,
+            created_by=user,
+        )
 
         return task
-
-
-

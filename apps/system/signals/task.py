@@ -1,9 +1,9 @@
+from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
-from django.contrib.contenttypes.models import ContentType
 
-from apps.tasks.models.task import Task
 from apps.system.models.activity_log import ActivityLog
+from apps.tasks.models.task import Task
 
 
 @receiver(post_save, sender=Task)
