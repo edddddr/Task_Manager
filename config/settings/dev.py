@@ -1,8 +1,6 @@
 # config/settings/dev.py
 import os
 
-from sentry_sdk.integrations.django import DjangoIntegration
-
 from .base import *
 
 DEBUG = True  # Enable debug mode

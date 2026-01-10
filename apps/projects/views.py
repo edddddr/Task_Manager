@@ -116,17 +116,33 @@ from apps.projects.models.project import Project
 from apps.projects.pagination import ProjectPagination
 from apps.projects.serializers import ProjectSerializer
 from apps.tasks.serializers import TaskSerializer
-from apps.tasks.pagination import TaskPagination
 from rest_framework.throttling import ScopedRateThrottle
+from apps.projects.permissions.project import (
+    IsProjectAdmin, 
+    IsProjectMember,
+)
+from apps.projects.permissions.utils import get_user_role
+from apps.projects.models.membership import ProjectRole
+from rest_framework.exceptions import PermissionDenied
 
 
 
 class ProjectViewSet(ModelViewSet):
-    throttle_classes = [ScopedRateThrottle]
     
     serializer_class = ProjectSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = ProjectPagination
+
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'projects'   
+
+    def get_permissions(self):
+        if self.action in ["destroy", "update", "partial_update"]:
+            permission_classes = [IsAuthenticated, IsProjectAdmin]
+        else:
+            permission_classes = [IsAuthenticated, IsProjectMember]
+
+        return [permission() for permission in permission_classes]
 
     
 
@@ -154,31 +170,22 @@ class ProjectViewSet(ModelViewSet):
 
     
     @action(
-        detail=True,
-        methods=["post"],
-        url_path="tasks",
-        throttle_scope="create_task"
-    )
-    def create_task(self, request, pk=None):
-        project = self.get_object()
-
-        serializer = TaskSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(project=project)
-
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    @action(
-        detail=True,
-        methods=["put", "patch"],
-        url_path="tasks/(?P<task_id>[^/.]+)",
-        throttle_scope="update_task",
-    )
+            detail=True,
+            methods=["put", "patch"],
+            url_path="tasks/(?P<task_id>[^/.]+)",
+            throttle_scope="update_task",
+        )
     def update_task(self, request, pk=None, task_id=None):
         project = self.get_object()
         task = project.tasks.get(id=task_id)
 
-        serializer = TaskSerializer(task, data=request.data, partial=True)
+        # RBAC: Only Admin or Editor can update tasks
+        role = get_user_role(request.user, project)
+        if role not in {ProjectRole.ADMIN, ProjectRole.EDITOR}:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("You do not have permission to update tasks in this project.")
+
+        serializer = TaskSerializer(task, data=request.data, partial=True, context={"request": request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
@@ -193,6 +200,11 @@ class ProjectViewSet(ModelViewSet):
     def delete_task(self, request, pk=None, task_id=None):
         project = self.get_object()
         task = project.tasks.get(id=task_id)
-        task.delete()
 
+        # RBAC: Only Admin can delete tasks
+        role = get_user_role(request.user, project)
+        if role != ProjectRole.ADMIN:
+            raise PermissionDenied("You do not have permission to delete tasks in this project.")
+
+        task.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

@@ -133,12 +133,14 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.UserRateThrottle",
         "rest_framework.throttling.AnonRateThrottle",   
-        "rest_framework.throttling.ScopedRateThrottle",
+        # "rest_framework.throttling.ScopedRateThrottle",
     ],  
     "DEFAULT_THROTTLE_RATES": {
         # Baseline
         "anon": "100/hour",
         "user": "1000/day",
+
+        'projects': '100/day',
 
         # Auth
         "register": "5/minute",

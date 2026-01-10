@@ -19,8 +19,8 @@ class Project(SoftDeleteModel, AuditModel):
 
     members = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
-        related_name="projects",
-        blank=True,
+        through="projects.ProjectMembership",
+        related_name="projects"
     )
 
     # created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='created_projects')

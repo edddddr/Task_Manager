@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from apps.projects.models.project import Project
+from apps.projects.models.membership import ProjectMembership, ProjectRole
+
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -38,5 +40,19 @@ class ProjectSerializer(serializers.ModelSerializer):
             **validated_data
         )
 
-        project.members.add(request.user, *members)
+        other_members = [m for m in members if m != request.user]
+        if other_members:
+            project.members.add(*other_members)
+
+        ProjectMembership.objects.create(
+            user=request.user,
+            project=project,
+            role=ProjectRole.ADMIN,
+        )
+
+        # other_members = [m for m in members if m != request.user]
+        # if other_members:
+        #     project.members.add(*other_members)
+
+
         return project
