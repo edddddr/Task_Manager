@@ -168,43 +168,76 @@ class ProjectViewSet(ModelViewSet):
         """
         instance.delete()
 
-    
     @action(
-            detail=True,
-            methods=["put", "patch"],
-            url_path="tasks/(?P<task_id>[^/.]+)",
-            throttle_scope="update_task",
-        )
-    def update_task(self, request, pk=None, task_id=None):
+    detail=True,
+    methods=["get", "post"],
+    url_path="tasks",
+)
+    def tasks(self, request, pk=None, **kargs):
         project = self.get_object()
-        task = project.tasks.get(id=task_id)
 
-        # RBAC: Only Admin or Editor can update tasks
         role = get_user_role(request.user, project)
-        if role not in {ProjectRole.ADMIN, ProjectRole.EDITOR}:
+        if role is None:
             from rest_framework.exceptions import PermissionDenied
-            raise PermissionDenied("You do not have permission to update tasks in this project.")
+            raise PermissionDenied("You are not a member of this project.")
 
-        serializer = TaskSerializer(task, data=request.data, partial=True, context={"request": request})
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        # 🔹 GET → list tasks
+        if request.method == "GET":
+            tasks = project.tasks.all()
+            serializer = TaskSerializer(tasks, many=True)
+            return Response(serializer.data)
 
-        return Response(serializer.data)
+        # 🔹 POST → create task
+        if request.method == "POST":
+            if role not in {ProjectRole.ADMIN, ProjectRole.EDITOR}:
+                raise PermissionDenied("Insufficient role to create tasks.")
+
+            serializer = TaskSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(project=project)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(
-        detail=True,
-        methods=["delete"],
-        url_path="tasks/(?P<task_id>[^/.]+)",
-        throttle_scope="delete_task",
-    )
-    def delete_task(self, request, pk=None, task_id=None):
+    detail=True,
+    methods=["get", "put", "patch", "delete"],
+    url_path=r"tasks/(?P<task_id>[^/.]+)",
+)
+    def task_detail(self, request, pk=None, task_id=None, **kargs):
         project = self.get_object()
         task = project.tasks.get(id=task_id)
 
-        # RBAC: Only Admin can delete tasks
         role = get_user_role(request.user, project)
-        if role != ProjectRole.ADMIN:
-            raise PermissionDenied("You do not have permission to delete tasks in this project.")
 
-        task.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        if role is None:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("You are not a member of this project.")
+
+        # 🔹 GET → retrieve task
+        if request.method == "GET":
+            serializer = TaskSerializer(task)
+            return Response(serializer.data)
+
+        # 🔹 UPDATE
+        if request.method in ["PUT", "PATCH"]:
+            if role not in {ProjectRole.ADMIN, ProjectRole.EDITOR}:
+                raise PermissionDenied("You do not have permission to update tasks.")
+
+            serializer = TaskSerializer(
+                task,
+                data=request.data,
+                partial=(request.method == "PATCH"),
+                context={"request": request},
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+
+        # 🔹 DELETE
+        if request.method == "DELETE":
+            if role != ProjectRole.ADMIN:
+                raise PermissionDenied("You do not have permission to delete tasks.")
+
+            task.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+                
