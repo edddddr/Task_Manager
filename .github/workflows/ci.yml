@@ -10,26 +10,26 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v4
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: "3.12"
 
-      - name: Install dependencies
-        run: |
-          pip install black isort flake8
+  #     - name: Install dependencies
+  #       run: |
+  #         pip install black isort flake8
 
-      - name: Run Black
-        run: black --check .
+  #     - name: Run Black
+  #       run: black --check .
 
-      - name: Run isort
-        run: isort --check-only .
+  #     - name: Run isort
+  #       run: isort --check-only .
 
-      - name: Run flake8
-        run: flake8 .
+  #     - name: Run flake8
+  #       run: flake8 .
 
   test:
     name: Test

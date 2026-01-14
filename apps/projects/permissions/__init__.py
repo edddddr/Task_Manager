@@ -1,8 +1,4 @@
-from .project import (
-    IsProjectAdmin,
-    IsProjectEditor,
-    IsProjectMember,
-)
+from .project import IsProjectAdmin, IsProjectEditor, IsProjectMember
 
 __all__ = [
     "IsProjectAdmin",

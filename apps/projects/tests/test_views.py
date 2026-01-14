@@ -1,8 +1,10 @@
 import pytest
-from rest_framework.test import APIClient
 from django.urls import reverse
-from apps.projects.tests.factories import UserFactory, ProjectFactory, MembershipFactory
+from rest_framework.test import APIClient
+
 from apps.projects.models.membership import ProjectRole
+from apps.projects.tests.factories import (MembershipFactory, ProjectFactory,
+                                           UserFactory)
 
 
 @pytest.mark.django_db
@@ -29,14 +31,8 @@ def test_admin_can_create_task():
     client.force_authenticate(user)
 
     response = client.post(
-        reverse("project-tasks", kwargs={
-        "version": "v1", 
-        "pk": project.id
-    }),
-        {"title": "Task 1", 
-        "description": "Task description", 
-        "project": project.id
-        },
+        reverse("project-tasks", kwargs={"version": "v1", "pk": project.id}),
+        {"title": "Task 1", "description": "Task description", "project": project.id},
     )
 
     assert response.status_code == 201

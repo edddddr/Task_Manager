@@ -20,9 +20,9 @@ class Project(SoftDeleteModel, AuditModel):
     members = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         through="projects.ProjectMembership",
-        related_name="projects"
+        related_name="projects",
     )
-    
+
     objects = ProjectManager()
 
     def update_project(self, *, name=None, description=None):
@@ -63,8 +63,5 @@ class Project(SoftDeleteModel, AuditModel):
             )
         ]
 
-    def __str__(self):  
+    def __str__(self):
         return self.name
-
-
-

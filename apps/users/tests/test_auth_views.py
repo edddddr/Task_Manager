@@ -1,8 +1,8 @@
 import pytest
-from rest_framework.test import APIClient
 from django.urls import reverse
-from apps.users.tests.factories import UserFactory
+from rest_framework.test import APIClient
 
+from apps.users.tests.factories import UserFactory
 
 
 @pytest.mark.django_db

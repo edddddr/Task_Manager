@@ -6,8 +6,6 @@ from decouple import config
 from dotenv import load_dotenv
 from sentry_sdk.integrations.django import DjangoIntegration
 
-from .base import *
-
 load_dotenv()
 
 DEBUG = False
@@ -22,7 +20,7 @@ DATABASES = {"default": dj_database_url.config(conn_max_age=600)}
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
-    
+
 SECURE_SSL_REDIRECT = False
 CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = False

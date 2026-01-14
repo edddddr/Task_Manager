@@ -1,8 +1,8 @@
-from rest_framework import serializers
-from apps.projects.models.project import Project
-from apps.projects.models.membership import ProjectMembership, ProjectRole
-
 from django.contrib.auth import get_user_model
+from rest_framework import serializers
+
+from apps.projects.models.membership import ProjectMembership, ProjectRole
+from apps.projects.models.project import Project
 
 User = get_user_model()
 
@@ -25,7 +25,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "members",
             "created_at",
             "updated_at",
-        ]   
+        ]
         read_only_fields = ["id", "owner", "created_at", "updated_at"]
 
     def create(self, validated_data):
@@ -35,10 +35,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         request = self.context["request"]
         members = validated_data.pop("members", [])
 
-        project = Project.objects.create(
-            owner=request.user,
-            **validated_data
-        )
+        project = Project.objects.create(owner=request.user, **validated_data)
 
         other_members = [m for m in members if m != request.user]
         if other_members:

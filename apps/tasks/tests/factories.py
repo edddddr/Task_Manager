@@ -2,7 +2,6 @@ import factory
 
 from apps.projects.tests.factories import ProjectFactory
 from apps.tasks.models.task import Task
-from apps.users.tests.factories import UserFactory
 
 
 class TaskFactory(factory.django.DjangoModelFactory):

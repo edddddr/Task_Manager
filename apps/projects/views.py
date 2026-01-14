@@ -1,31 +1,27 @@
-from rest_framework.decorators import action
-from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
+from rest_framework.viewsets import ModelViewSet
+
+from apps.projects.models.membership import ProjectRole
 from apps.projects.models.project import Project
 from apps.projects.pagination import ProjectPagination
+from apps.projects.permissions.project import IsProjectAdmin, IsProjectMember
+from apps.projects.permissions.utils import get_user_role
 from apps.projects.serializers import ProjectSerializer
 from apps.tasks.serializers import TaskSerializer
-from rest_framework.throttling import ScopedRateThrottle
-from apps.projects.permissions.project import (
-    IsProjectAdmin, 
-    IsProjectMember,
-)
-from apps.projects.permissions.utils import get_user_role
-from apps.projects.models.membership import ProjectRole
-from rest_framework.exceptions import PermissionDenied
-
 
 
 class ProjectViewSet(ModelViewSet):
-    
+
     serializer_class = ProjectSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = ProjectPagination
 
     throttle_classes = [ScopedRateThrottle]
-    throttle_scope = 'projects'   
+    throttle_scope = "projects"
 
     def get_permissions(self):
         if self.action in ["destroy", "update", "partial_update"]:
@@ -35,15 +31,13 @@ class ProjectViewSet(ModelViewSet):
 
         return [permission() for permission in permission_classes]
 
-    
-
     def get_queryset(self):
         """
         User can only see projects where they are a member.
         Soft-deleted projects excluded by default manager.
         """
         return Project.objects.filter(members=self.request.user)
-    
+
     def get_throttle_scope(self):
         if self.action == "create":
             return "create_project"
@@ -60,16 +54,17 @@ class ProjectViewSet(ModelViewSet):
         instance.delete()
 
     @action(
-    detail=True,
-    methods=["get", "post"],
-    url_path="tasks",
-)
+        detail=True,
+        methods=["get", "post"],
+        url_path="tasks",
+    )
     def tasks(self, request, pk=None, **kargs):
         project = self.get_object()
 
         role = get_user_role(request.user, project)
         if role is None:
             from rest_framework.exceptions import PermissionDenied
+
             raise PermissionDenied("You are not a member of this project.")
 
         # 🔹 GET → list tasks
@@ -89,10 +84,10 @@ class ProjectViewSet(ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(
-    detail=True,
-    methods=["get", "put", "patch", "delete"],
-    url_path=r"tasks/(?P<task_id>[^/.]+)",
-)
+        detail=True,
+        methods=["get", "put", "patch", "delete"],
+        url_path=r"tasks/(?P<task_id>[^/.]+)",
+    )
     def task_detail(self, request, pk=None, task_id=None, **kargs):
         project = self.get_object()
         task = project.tasks.get(id=task_id)
@@ -101,6 +96,7 @@ class ProjectViewSet(ModelViewSet):
 
         if role is None:
             from rest_framework.exceptions import PermissionDenied
+
             raise PermissionDenied("You are not a member of this project.")
 
         # 🔹 GET → retrieve task
@@ -130,5 +126,3 @@ class ProjectViewSet(ModelViewSet):
 
             task.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-
-                

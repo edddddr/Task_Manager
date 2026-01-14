@@ -1,10 +1,8 @@
 from django.conf import settings  # Reusable app for user
 from django.db import models
 
-from apps.system.models.activity_log import ActivityLog
 from apps.system.models.base_models import AuditModel, SoftDeleteModel
 from apps.tasks.models.manager import TaskManager
-from apps.users.models import User
 
 
 class TaskStatus(models.TextChoices):
@@ -30,7 +28,7 @@ class Task(SoftDeleteModel, AuditModel):
     priority = models.CharField(
         max_length=20, choices=TaskPriority.choices, default="medium"
     )
-    
+
     due_date = models.DateTimeField(null=True, blank=True)
 
     objects = TaskManager()

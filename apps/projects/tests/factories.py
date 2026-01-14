@@ -1,7 +1,8 @@
 import factory
 from django.contrib.auth import get_user_model
-from apps.projects.models.project import Project
+
 from apps.projects.models.membership import ProjectMembership, ProjectRole
+from apps.projects.models.project import Project
 from apps.tasks.models.task import Task
 
 User = get_user_model()
@@ -15,9 +16,7 @@ class UserFactory(factory.django.DjangoModelFactory):
     username = factory.Sequence(lambda n: f"user{n}")
     email = factory.Sequence(lambda n: f"user{n}@example.com")
 
-    password = factory.PostGenerationMethodCall(
-        "set_password", "password123"
-    )
+    password = factory.PostGenerationMethodCall("set_password", "password123")
 
 
 class ProjectFactory(factory.django.DjangoModelFactory):
