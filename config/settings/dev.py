@@ -10,11 +10,11 @@ DEBUG = True  # Enable debug mode
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "task_manager_dev",  # The name of your database
-        "USER": "postgres",  # The PostgreSQL username
-        "PASSWORD": "password",  # The user's password
-        "HOST": "localhost",  # Set to an IP address or hostname for remote databases
-        "PORT": "5432",  # Set to the port number (defaults to 5432 if empty)
+        "NAME": "task_manager_dev",  
+        "USER": "postgres",
+        "PASSWORD": "password",
+        "HOST": "localhost", 
+        "PORT": "5432",  
     }
 }
 

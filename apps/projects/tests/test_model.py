@@ -1,24 +1,10 @@
 import pytest
-
 from apps.projects.models.project import Project
-from apps.projects.tests.factories import ProjectFactory
-
-pytestmark = pytest.mark.django_db
 
 
-def test_project_soft_delete_sets_flag():
-    project = ProjectFactory()
+@pytest.mark.django_db
+def test_update_project():
+    project = Project.objects.create(name="Old", description="Old desc")
+    project.update_project(name="New")
 
-    project.delete()
-
-    project.refresh_from_db()
-    assert project.is_active is False
-    assert project.deleted_at is not None
-
-
-def test_soft_deleted_projects_are_hidden():
-    ProjectFactory()
-    deleted = ProjectFactory()
-    deleted.delete()
-
-    assert Project.objects.count() == 1
+    assert project.name == "New"

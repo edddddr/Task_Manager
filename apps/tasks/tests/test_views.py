@@ -4,7 +4,7 @@ import pytest
 
 from apps.projects.tests.factories import ProjectFactory
 from apps.tasks.models.task import Task
-from apps.tasks.tests.refactories import TaskFactory
+from apps.tasks.tests.factories import TaskFactory
 from apps.users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db

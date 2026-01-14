@@ -49,10 +49,4 @@ class ProjectSerializer(serializers.ModelSerializer):
             project=project,
             role=ProjectRole.ADMIN,
         )
-
-        # other_members = [m for m in members if m != request.user]
-        # if other_members:
-        #     project.members.add(*other_members)
-
-
         return project

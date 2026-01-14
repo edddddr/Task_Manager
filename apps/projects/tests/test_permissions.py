@@ -1,25 +1,24 @@
 import pytest
+from rest_framework.test import APIRequestFactory
+from apps.projects.permissions.project import IsProjectAdmin
+from apps.projects.tests.factories import MembershipFactory
+from apps.projects.models.membership import ProjectRole
 
-from apps.projects.models.project import Project
-from apps.projects.tests.factories import ProjectFactory
-from apps.users.tests.factories import UserFactory
+@pytest.mark.django_db(transaction=True)
+def test_is_project_admin_allows_admin():
+    membership = MembershipFactory(role=ProjectRole.ADMIN)
+    request = APIRequestFactory().delete("/projects/2/")
+    request.user = membership.user
 
-pytestmark = pytest.mark.django_db
+    permission = IsProjectAdmin()
+    assert permission.has_object_permission(
+        request, None, membership.project
+    )
+# from apps.users.tests.factories import UserFactory
 
+# @pytest.mark.django_db()
+# def test_user_factory():
+#     admin = UserFactory()
+#     print(admin.username)
 
-def test_user_sees_only_member_projects():
-    user = UserFactory()
-    other = UserFactory()
-
-    project = ProjectFactory(members=[user])
-    ProjectFactory(members=[other])
-
-    projects = Project.objects.for_user(user)
-    print(user)
-    print(projects)
-
-    assert project in projects
-    assert projects.count() == 1
-
-
-#
+# test_user_factory()

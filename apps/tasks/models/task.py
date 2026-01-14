@@ -30,39 +30,10 @@ class Task(SoftDeleteModel, AuditModel):
     priority = models.CharField(
         max_length=20, choices=TaskPriority.choices, default="medium"
     )
-    # The relation M2M is transform after evloved to Postgresql
-    # assigned_to = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="assigned_tasks", blank=True)
+    
     due_date = models.DateTimeField(null=True, blank=True)
 
     objects = TaskManager()
-
-    # def update_task(self, data, *, user=None):
-    #     old_status = self.status
-
-    #     self.title = data.get("title", self.title)
-    #     self.description = data.get("description", self.description)
-    #     self.status = data.get("status", self.status)
-    #     self.priority = data.get("priority", self.priority)
-
-    #     if "assigned_to" in data:
-    #         self.assigned_to = (
-    #             User.objects.get(id=data["assigned_to"])
-    #             if data["assigned_to"]
-    #             else None
-    #         )
-
-    #     self.save()
-
-    #     if old_status != self.status:
-    #         ActivityLog.objects.create(
-    #             actor=user,
-    #             action="TASK_STATUS_CHANGED",
-    #             content_object=self,
-    #             metadata={
-    #                 "from": old_status,
-    #                 "to": self.status,
-    #             },
-    #         )
 
     def to_dict(self):
         return {

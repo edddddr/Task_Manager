@@ -22,13 +22,7 @@ class Project(SoftDeleteModel, AuditModel):
         through="projects.ProjectMembership",
         related_name="projects"
     )
-
-    # created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='created_projects')
-    # members = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='projects')
-    # is_active = models.BooleanField(default=True)
-    # created_at = models.DateTimeField(auto_now_add=True)
-    # updated_at = models.DateTimeField(auto_now=True)
-
+    
     objects = ProjectManager()
 
     def update_project(self, *, name=None, description=None):

@@ -1,25 +1,45 @@
 import factory
-
+from django.contrib.auth import get_user_model
 from apps.projects.models.project import Project
-from apps.users.tests.factories import UserFactory
+from apps.projects.models.membership import ProjectMembership, ProjectRole
+from apps.tasks.models.task import Task
+
+User = get_user_model()
+
+
+class UserFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = User
+        django_get_or_create = ()
+
+    username = factory.Sequence(lambda n: f"user{n}")
+    email = factory.Sequence(lambda n: f"user{n}@example.com")
+
+    password = factory.PostGenerationMethodCall(
+        "set_password", "password123"
+    )
 
 
 class ProjectFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Project
 
-    name = factory.Faker("sentence", nb_words=3)
-    description = factory.Faker("text")
+    name = factory.Sequence(lambda n: f"Project {n}")
     owner = factory.SubFactory(UserFactory)
-    created_by = factory.SelfAttribute("owner")
-    updated_by = factory.SelfAttribute("owner")
 
-    @factory.post_generation
-    def members(self, create, extracted, **kwargs):
-        if not create or not extracted:
-            return
 
-        # Add the members passed in: ProjectFactory(members=[user])
-        for member in extracted:
-            self.members.add(member)
-            print("member is created")
+class MembershipFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = ProjectMembership
+
+    user = factory.SubFactory(UserFactory)
+    project = factory.SubFactory(ProjectFactory)
+    role = ProjectRole.VIEWER
+
+
+class TaskFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Task
+
+    title = "Test Task"
+    project = factory.SubFactory(ProjectFactory)

@@ -20,16 +20,6 @@ class CustomUserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    # ROLE_ADMIN = "admin"
-    # ROLE_MANAGER = "manager"
-    # ROLE_MEMBER = "member"
-
-    # ROLE_CHOICES = [
-    #     (ROLE_ADMIN, "Admin"),
-    #     (ROLE_MANAGER, "Manager"),
-    #     (ROLE_MEMBER, "Member"),
-    # ]
-
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=50, blank=True)

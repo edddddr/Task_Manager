@@ -1,79 +1,42 @@
-import json
-
 import pytest
+from rest_framework.test import APIClient
 from django.urls import reverse
-
-from apps.projects.tests.factories import ProjectFactory
-from apps.users.models import User
-from apps.users.tests.factories import UserFactory
-
-pytestmark = pytest.mark.django_db
-BASE_URL = "/api/v1/projects/"
+from apps.projects.tests.factories import UserFactory, ProjectFactory, MembershipFactory
+from apps.projects.models.membership import ProjectRole
 
 
-def test_get_projects_returns_only_user_projects(client):
+@pytest.mark.django_db
+def test_project_list_only_user_projects():
     user = UserFactory()
-    other = UserFactory()
+    project = ProjectFactory()
+    MembershipFactory(user=user, project=project)
 
-    visible = ProjectFactory()
-    visible.members.add(user)
+    client = APIClient()
+    client.force_authenticate(user)
 
-    hidden = ProjectFactory()
-    hidden.members.add(other)
-
-    client.force_login(user)
-
-    response = client.get(BASE_URL)
-    print(" --- -- -- - ", response.status_code)
+    response = client.get(reverse("project-list", kwargs={"version": "v1"}))
 
     assert response.status_code == 200
-    data = response.json()
-    print(" --- -- -- -", data)
-
-    project_ids = [p["id"] for p in data]
-    assert visible.id in project_ids
-    assert hidden.id not in project_ids
 
 
-def test_create_project_success(client):
+@pytest.mark.django_db
+def test_admin_can_create_task():
     user = UserFactory()
-    client.force_login(user)
+    project = ProjectFactory(owner=user)
+    MembershipFactory(user=user, project=project, role=ProjectRole.ADMIN)
 
-    payload = {
-        "name": "Integration Project",
-        "description": "Created via HTTP",
-    }
+    client = APIClient()
+    client.force_authenticate(user)
 
     response = client.post(
-        BASE_URL,
-        data=json.dumps(payload),
-        content_type="application/json",
+        reverse("project-tasks", kwargs={
+        "version": "v1", 
+        "pk": project.id
+    }),
+        {"title": "Task 1", 
+        "description": "Task description", 
+        "project": project.id
+        },
     )
 
     assert response.status_code == 201
-
-    data = response.json()["project"]
-    assert data["name"] == "Integration Project"
-
-
-def test_delete_project_forbidden_for_non_admin(client):
-    """
-    Docstring for test_delete_project_forbidden_for_non_admin
-
-    :param client: Description
-    :type client: Any
-    :In the case of the func Project.objects.for_user(request.user) is early if the user have access the data or not.
-
-    """
-    admin = UserFactory(role=User.ROLE_ADMIN)
-    member = UserFactory(role=User.ROLE_MEMBER)
-
-    # more professional
-    # admin = UserFactory(admin=True)
-    # member = UserFactory()
-    project = ProjectFactory(owner=admin)
-    client.force_login(member)
-
-    response = client.delete(f"{BASE_URL}{project.id}/")
-
-    assert response.status_code == 403

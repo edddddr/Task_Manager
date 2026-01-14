@@ -1,3 +1,4 @@
+from datetime import timedelta
 import os
 import sys
 from pathlib import Path
@@ -164,4 +165,9 @@ REST_FRAMEWORK = {
         "rest_framework.versioning.URLPathVersioning",
     "DEFAULT_VERSION": "v1",
     "ALLOWED_VERSIONS": ["v1"],
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
 }
