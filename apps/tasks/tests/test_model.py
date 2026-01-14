@@ -1,6 +1,7 @@
 import pytest
+
 from apps.tasks.models.task import Task, TaskStatus
-from tests.factories import ProjectFactory
+from apps.tasks.tests.factories import ProjectFactory
 
 
 @pytest.mark.django_db
