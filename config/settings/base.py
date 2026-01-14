@@ -2,6 +2,7 @@ import os
 import sys
 from datetime import timedelta
 from pathlib import Path
+from pythonjsonlogger import json
 
 # Load environment variables
 from dotenv import load_dotenv
@@ -85,7 +86,7 @@ LOGGING = {
     "disable_existing_loggers": False,
     "formatters": {
         "json": {
-            "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
+            "()": "pythonjsonlogger.json.JsonFormatter",
             "format": "%(levelname)s %(name)s %(message)s %(asctime)s",
         },
     },

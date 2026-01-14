@@ -6,7 +6,7 @@ from apps.projects.permissions.project import IsProjectAdmin
 from apps.projects.tests.factories import MembershipFactory
 
 
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.django_db()
 def test_is_project_admin_allows_admin():
     membership = MembershipFactory(role=ProjectRole.ADMIN)
     request = APIRequestFactory().delete("/projects/2/")
