@@ -12,7 +12,7 @@ load_dotenv()
 # 1️⃣ Build paths
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
-print("SECRET_KEY: _______---------________----", SECRET_KEY)
+
 # 2️⃣ Apps
 INSTALLED_APPS = [
     "django.contrib.admin",

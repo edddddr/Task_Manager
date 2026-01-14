@@ -1,5 +1,11 @@
 from .base import *
+# Pull from environment, fallback to a dummy key if missing
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-test-key-only-for-ci")
 
+# Ensure other settings (like SimpleJWT) can see it
+SIGNING_KEY = SECRET_KEY 
+
+print("SECRET_KEY: _______---------________----", SECRET_KEY)
 # Database for GitHub Actions (matches your YAML services)
 DATABASES = {
     'default': {
