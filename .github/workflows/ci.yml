@@ -53,13 +53,13 @@ jobs:
           python manage.py migrate
         env:
           DATABASE_URL: postgres://test_user:test_pass@localhost:5432/test_db
-          DJANGO_SETTINGS_MODULE: config.settings.test
+          DJANGO_SETTINGS_MODULE: config.settings.prod
 
       - name: Run tests
         env:
           DATABASE_URL: postgres://test_user:test_pass@localhost:5432/test_db
           REDIS_URL: redis://localhost:6379/0
-          DJANGO_SETTINGS_MODULE: config.settings.test
+          DJANGO_SETTINGS_MODULE: config.settings.prod
         run: |
           pytest
 
