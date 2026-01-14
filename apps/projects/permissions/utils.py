@@ -1,4 +1,4 @@
-from apps.projects.models import ProjectMembership
+from apps.projects.models.membership import ProjectMembership
 
 
 def get_user_role(user, project):
