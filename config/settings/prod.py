@@ -1,5 +1,5 @@
 import os
-
+from .base import *
 import dj_database_url
 import sentry_sdk
 from decouple import config
@@ -12,7 +12,7 @@ DEBUG = False
 
 # ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
-SECRET_KEY = config("SECRET_KEY")
+# SECRET_KEY = config("SECRET_KEY")
 
 DATABASES = {"default": dj_database_url.config(conn_max_age=600)}
 
