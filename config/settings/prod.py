@@ -10,7 +10,7 @@ load_dotenv()
 
 DEBUG = False
 
-# ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(",")
 
 # SECRET_KEY = config("SECRET_KEY")
 
